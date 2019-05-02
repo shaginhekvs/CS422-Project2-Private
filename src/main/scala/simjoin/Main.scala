@@ -39,8 +39,8 @@ object Main {
     val sj = new SimilarityJoin(numAnchors, distanceThreshold)
     val res = sj.similarity_join(dataset, attrIndex)           
     
-    val resultSize = res.count
-    println(resultSize)
+    //val resultSize = res.count
+    //println(resultSize)
     val t2 = System.nanoTime
             
     println((t2-t1)/(Math.pow(10,9)))
