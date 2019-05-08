@@ -20,28 +20,29 @@ object MyFunctions {
     var value = 0.0;
     if(agg == "COUNT")value = 1.0;
     else value = MyFunctions.parseDouble(currentRow.get(index)).getOrElse(0.0);
-    return value;
+    return value
   }
   
-  def getHashMapValue(curKey :collection.mutable.Map[Int,Any],count : collection.mutable.HashMap[collection.mutable.Map[Int,Any], Double], agg:String): Double ={
-    var gotten = 0.0;
-    if(agg == "COUNT" || agg == "SUM" ||agg == "AVG")gotten = count.getOrElse(curKey,0.0);
-    else if(agg == "MIN") gotten =  count.getOrElse(curKey,Double.MaxValue); // keep max value possible as initial state for finding min value in dataset
-    else gotten =  count.getOrElse(curKey,Double.MinValue);
+  def getHashMapValue(curKey :collection.mutable.Map[Int,Any],count : collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)], agg:String): (Double,Double) ={
+    var gotten = (0.0,0.0);
+    if(agg == "COUNT" || agg == "SUM" ||agg == "AVG")gotten = count.getOrElse(curKey,(0.0,0.0));
+    else if(agg == "MIN") gotten =  count.getOrElse(curKey,(Double.MaxValue,0.0)); // keep max value possible as initial state for finding min value in dataset
+    else gotten =  count.getOrElse(curKey,(Double.MinValue,0.0));
+    
     
   return gotten;
     }
   
-  def accumulateFunc(x:Double , y:Double, agg:String): Double ={
+  def accumulateFunc(x:(Double,Double) , y:(Double,Double), agg:String): (Double,Double) ={
     var value  = 0.0;
-    if(agg == "COUNT" || agg == "SUM" || agg == "AVG")value = x+y;
-    else if (agg == "MIN") value = math.max(x,y);
-    else if (agg == "MAX") value =math.max(x,y);
-    return value;
+    if(agg == "COUNT" || agg == "SUM" || agg == "AVG")value = x._1+y._1;
+    else if (agg == "MIN") value = math.max(x._1,y._1);
+    else if (agg == "MAX") value =math.max(x._1,y._1);
+    return (value,x._2+y._2);
   }
   
-  def genPartialCells(curKey :collection.mutable.Map[Int,Any],curValue:Double):ListBuffer[(collection.mutable.Map[Int,Any],Double)]={
-    var curList = new ListBuffer[(collection.mutable.Map[Int,Any],Double)]();
+  def genPartialCells(curKey :collection.mutable.Map[Int,Any],curValue:Double,curValue2:Double):ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))]={
+    var curList = new ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))]();
     var colsList = curKey.keySet.toList
     for (i<- 1 to colsList.size){
       val this_it = colsList.combinations(i);
@@ -49,11 +50,34 @@ object MyFunctions {
         var thisSet = this_it.next().toSet;
         var keyMapFiltered = collection.mutable.Map[Int,Any]();
         thisSet.foreach( x=> keyMapFiltered +=  ((x)-> curKey(x)));
-        curList += ((keyMapFiltered,curValue)); //immutable map
+        curList += ((keyMapFiltered,(curValue,curValue2))); //immutable map
+        
       }
       
     }
     return curList;
+  }
+  def makeStringKey( x:(collection.mutable.Map[Int,Any],(Double,Double)),indices:List[Int],agg:String):(String,Double)={
+    var key_str:String = "";
+    var count:Int = 0;
+    for (i <- indices){
+      if(count>0)key_str += " , "
+      if( x._1.contains(i)){
+        key_str += x._1(i)  
+      }
+      else{
+        key_str +="*"
+      }
+     count += 1;
+    }
+    var result:Double = x._2._1;
+    if(agg == "AVG")
+    {
+      var c = x._2._2
+      if(c == 0) c = c+1;
+        result = result/ c;
+    }
+    return (key_str,result)
   }
 }
 
@@ -82,22 +106,36 @@ class CubeOperator(reducers: Int) {
     println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
     val indexAgg = schema.indexOf(aggAttribute)
-    val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),MyFunctions.genValue(indexAgg,x,agg)));
+    val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),(MyFunctions.genValue(indexAgg,x,agg),1.0)));
     mrspreadMap.take(10).map(println );
     val mrspreadCombine =  mrspreadMap.mapPartitions(it =>
-    it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], Double])(
-      (count, row) => count += (row._1 -> MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg))
+    it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
+      (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
     ).toIterator
   )
   println("mrspread combine below")
   mrspreadCombine.take(10).map(println );
   
-  val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg)).persist()
+  val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
   println("mrspread reduce below")
   mrspreadReduce.take(10).map(println );  
-  val mrspreadPartialCells = mrspreadReduce.flatMap((x)=>MyFunctions.genPartialCells(x._1,x._2));
+  val mrspreadPartialCells = mrspreadReduce.flatMap((x)=>MyFunctions.genPartialCells(x._1,x._2._1,x._2._2));
   println("mrspread partial cells below")
-  mrspreadPartialCells.take(10).map(println );  
+  mrspreadPartialCells.take(10).map(println); 
+  println("mrassemble combine");
+  val mrAssembleCombine = mrspreadPartialCells.mapPartitions(it =>
+    it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
+      (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
+    ).toIterator
+  )
+  val mrAssembleReduce = mrAssembleCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers)
+  
+  val stringKey = mrAssembleReduce.map((x)=>MyFunctions.makeStringKey(x,index,agg))
+  
+  mrAssembleReduce.take(10).map(println); 
+  //stringKey.take(10).map(println); 
+  val sorted = stringKey.sortByKey();
+  sorted.take(10).map(println);
   null
     
   }

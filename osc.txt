@@ -1,0 +1,16 @@
+qcs 
+1- l_returnflag, l_linestatus , where ( s_shipdate <= date .... ) 
+3 - l_orderkey , l_shipdate, 
+5 - l_orderkey , l_suppkey ,
+6 - l_shipdate , l_discount , l_quantity
+7 - 
+9-
+10- l_orderkey , l_returnflag
+11 - 
+12 - l_shipmode, l_commitdate , l_shipdate, l_receiptdate , l_orderkey 
+17 - l_partkey , l_quantity 
+18 - l_orderkey , l_quantity 
+19 - l_quantity, l_shipmode , l_shipinstruct, 
+20 - , 
+
+

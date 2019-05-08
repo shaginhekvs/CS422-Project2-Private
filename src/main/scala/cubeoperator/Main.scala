@@ -1,5 +1,5 @@
 package cubeoperator
-
+import org.apache.spark
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.expressions._
@@ -34,7 +34,7 @@ object Main {
 
     var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
 
-    val res = cb.cube(dataset, groupingList, "lo_supplycost", "SUM")
+    val res = cb.cube(dataset, groupingList, "lo_supplycost", "AVG")
 
     /*
        The above call corresponds to the query:
@@ -45,8 +45,9 @@ object Main {
 
 
     //Perform the same query using SparkSQL
+
         val q1 = df.cube("lo_suppkey","lo_shipmode","lo_orderdate")
-          .agg(sum("lo_supplycost") as "sum supplycost");
+          .agg(sum("lo_supplycost") as "avg supplycost");
         q1.show
 
        println("cube here");
