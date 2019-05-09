@@ -10,20 +10,30 @@ object Main {
   def main(args: Array[String]) {
     val reducers = 10
 
-    val inputFile= "../lineorder_small.tbl"
+    //val inputFile= "../lineorder_small.tbl"
+    val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
+    //val input = new File(getClass.getResource(inputFile).getFile).getPath
     val input = new File(getClass.getResource(inputFile).getFile).getPath
-
-    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
+    val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[16]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)
-
+/*
     val df = sqlContext.read
       .format("com.databricks.spark.csv")
       .option("header", "true")
       .option("inferSchema", "true")
       .option("delimiter", "|")
       .load(input)
-
+      sqlContext.read
+*/
+    val df = sqlContext.read
+    .format("com.databricks.spark.csv")
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .option("delimiter", ",")
+    .load(inputFile)
+    
+    
     val rdd = df.rdd
 
     val schema = df.schema.toList.map(x => x.name)
@@ -33,9 +43,10 @@ object Main {
     val cb = new CubeOperator(reducers)
 
     var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
-
+    println("fast")
     val res = cb.cube(dataset, groupingList, "lo_supplycost", "AVG")
-    //val res = cb.cube_naive(dataset, groupingList, "lo_supplycost", "AVG")
+    println("naive")
+    val res2 = cb.cube_naive(dataset, groupingList, "lo_supplycost", "AVG")
 
     /*
        The above call corresponds to the query:

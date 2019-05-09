@@ -5,9 +5,11 @@ import org.apache.spark.sql.Row
 import scala.util.Try
 import scala.collection.mutable.ListBuffer
 class Key(var attrsIndex:Map[Int,Any]){
+
   
   
 }
+
 object MyFunctions {
   def parseDouble(s: Any): Option[Double] = Try { s.toString.toDouble }.toOption
   
@@ -44,7 +46,7 @@ object MyFunctions {
   def genPartialCells(curKey :collection.mutable.Map[Int,Any],curValue:Double,curValue2:Double):ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))]={
     var curList = new ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))]();
     var colsList = curKey.keySet.toList
-    for (i<- 1 to colsList.size){
+    for (i<- 0 to colsList.size + 1 ){
       val this_it = colsList.combinations(i);
       while(this_it.hasNext){
         var thisSet = this_it.next().toSet;
@@ -81,6 +83,41 @@ object MyFunctions {
   }
 }
 
+object MyFunctionsNaive {
+  
+  def genMap(indicesToKeep:List[Int],currentRow:Row): collection.mutable.Map[Int,Any] = {
+    var mapKey = collection.mutable.Map[Int,Any]();
+    indicesToKeep.foreach( x=> mapKey +=  (x-> currentRow.get(x)));
+    return mapKey
+  }
+  
+  def genValue(index:Int , currentRow:Row,agg: String): Double ={
+    var value = 0.0;
+    if(agg == "COUNT")value = 1.0;
+    else value = MyFunctions.parseDouble(currentRow.get(index)).getOrElse(0.0);
+    return value
+  }
+  
+  def accumulateFunc(x:(Double,Double) , y:(Double,Double), agg:String): (Double,Double) ={
+    var value  = 0.0;
+    if(agg == "COUNT" || agg == "SUM" || agg == "AVG")value = x._1+y._1;
+    else if (agg == "MIN") value = math.max(x._1,y._1);
+    else if (agg == "MAX") value =math.max(x._1,y._1);
+    return (value,x._2+y._2);
+  }
+  
+  def genRegionTupes(listRegions:ListBuffer[List[Int]] , currentRow:Row,index: Int, agg: String): ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))] = {
+    var thisList = new ListBuffer[(collection.mutable.Map[Int,Any],(Double,Double))];
+    for (region <- listRegions){
+      var thisMap = MyFunctionsNaive.genMap(region,currentRow)
+      thisList += ((thisMap,(MyFunctionsNaive.genValue(index,currentRow,agg),1.0)));
+    }
+    thisList
+    
+   
+  }
+
+}
 
 
 class CubeOperator(reducers: Int) {
@@ -157,8 +194,14 @@ class CubeOperator(reducers: Int) {
           allPartitions += l
       //allPartitions
     }
-    println(allPartitions)
-
+    
+    val afterMap = rdd.flatMap(x=> (MyFunctionsNaive.genRegionTupes(allPartitions,x,indexAgg, agg)));
+    val reduceRegions = afterMap.reduceByKey((x,y)=> {MyFunctionsNaive.accumulateFunc(x,y,agg)},reducers);
+    val stringKey = reduceRegions.map((x)=>MyFunctions.makeStringKey(x,index,agg))
+    val sorted = stringKey.sortByKey();
+    sorted.take(10).map(println);
+    //println(allPartitions)
+    //afterMap.take(10).map(println);
     
     null
   }
