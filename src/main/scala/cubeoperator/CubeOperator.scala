@@ -15,6 +15,7 @@ object MyFunctions {
   
   def genMap(indicesToKeep:List[Int],currentRow:Row): collection.mutable.Map[Int,Any] = {
     var mapKey = collection.mutable.Map[Int,Any]();
+    println(currentRow);
     indicesToKeep.foreach( x=> mapKey +=  (x-> currentRow.get(x)));
     return mapKey
   }
