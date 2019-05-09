@@ -18,17 +18,27 @@ object Main {
     val distanceThreshold = 2
     val attrIndex = 0    
         
-    val input = new File(getClass.getResource(inputFile).getFile).getPath    
-    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[*]")
+    //val input = new File(getClass.getResource(inputFile).getFile).getPath    
+    val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)   
     
+    /*
     val df = sqlContext.read
     .format("com.databricks.spark.csv")
     .option("header", "true")
     .option("inferSchema", "true")
     .option("delimiter", ",")
     .load(input)      
+    * 
+    */
+    val df = sqlContext.read
+    .format("com.databricks.spark.csv")
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .option("delimiter", ",")
+    .parquet("/cs422-data/tpch/sf100/parquet/lineitem.parquet")
+    
     
     val rdd = df.rdd        
     val schema = df.schema.toList.map(x => x.name)    
