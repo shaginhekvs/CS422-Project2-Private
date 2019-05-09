@@ -142,7 +142,24 @@ class CubeOperator(reducers: Int) {
 
   def cube_naive(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
 
-    //TODO naive algorithm for cube computation
+    val rdd = dataset.getRDD()
+    val schema = dataset.getSchema()
+    //rdd.take(10).map( x=> println(x.get(5)) );
+    
+    //println(schema)
+    val index = groupingAttributes.map(x => schema.indexOf(x))
+    val indexAgg = schema.indexOf(aggAttribute)
+    
+    var allPartitions = collection.mutable.ListBuffer[List[Int]]()
+    allPartitions
+    for(x<- Range(0,index.size+1)){
+      for (l <- index.combinations(x).toList)
+          allPartitions += l
+      //allPartitions
+    }
+    println(allPartitions)
+
+    
     null
   }
 
