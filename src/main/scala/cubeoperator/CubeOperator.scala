@@ -139,10 +139,10 @@ class CubeOperator(reducers: Int) {
 
     val rdd = dataset.getRDD()
     val schema = dataset.getSchema()
-    rdd.take(10).map( x=> println(x.get(5)) );
-    
+    println("Schema is below")
     println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
+    println(index)
     val indexAgg = schema.indexOf(aggAttribute)
     val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),(MyFunctions.genValue(indexAgg,x,agg),1.0)));
     mrspreadMap.take(10).map(println );
