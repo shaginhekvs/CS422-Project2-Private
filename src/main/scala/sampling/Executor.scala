@@ -26,7 +26,7 @@ object Executor {
     val sqlDF = sqlContext.sql(s);
     println("result of query")
     sqlDF.show();
-    sqlDF.write.csv("/home/ksingh/1_result.csv")
+    //sqlDF.write.csv("/home/ksingh/1_result.csv")
   }
 
   def execute_Q3(desc: Description, session: SparkSession, params: List[Any]) = {
