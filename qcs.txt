@@ -3,14 +3,14 @@ qcs
 3 - l_orderkey , l_shipdate, 
 5 - l_orderkey , l_suppkey ,
 6 - l_shipdate , l_discount , l_quantity
-7 - 
-9-
+7 - supp_nation, cust_nation, l_year, where ( l_shipdate between '1995-01-01' and '1996-12-31' )
+9- nation, o_year, where ( p_name like '%green%' )
 10- l_orderkey , l_returnflag
-11 - 
+11 - ps_partkey, where (n_name = 'GERMANY')
 12 - l_shipmode, l_commitdate , l_shipdate, l_receiptdate , l_orderkey 
 17 - l_partkey , l_quantity 
 18 - l_orderkey , l_quantity 
 19 - l_quantity, l_shipmode , l_shipinstruct, 
-20 - , 
+20 - where ( n_name = 'CANADA' )
 
 

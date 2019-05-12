@@ -1,0 +1,23 @@
+qcs 
+1 - l_returnflag, l_linestatus , where ( s_shipdate <= date .... ) 
+2 - where ( p_size = 15 and p_type like '%BRASS' and r_name = 'EUROPE' )
+3 - l_orderkey , l_shipdate, 
+4 - o_orderpriority, where ( o_orderdate >= '1993-07-01' and o_orderdate < '1993-10-01')
+5 - l_orderkey , l_suppkey ,
+6 - l_shipdate , l_discount , l_quantity
+7 - supp_nation, cust_nation, l_year, where ( l_shipdate between '1995-01-01' and '1996-12-31' )
+8 - o_year, where ( r_name = 'AMERICA' and (o_orderdate between '1995-01-01' and '1996-12-31') and p_type = 'ECONOMY ANODIZED STEEL')
+9 - nation, o_year, where ( p_name like '%green%' )
+10- l_orderkey , l_returnflag
+11 - ps_partkey, where (n_name = 'GERMANY')
+12 - l_shipmode, l_commitdate , l_shipdate, l_receiptdate , l_orderkey 
+13 - c_count
+14 - where (l_shipdate >= '1995-09-01' and l_shipdate < '1995-10-01')
+15 - l_suppkey, where ( p_brand <> 'Brand#45' and l_shipdate >= '1996-01-01' and l_shipdate < '1996-04-01' ) 
+16 - p_brand, p_type, p_size, where ( p_size in (49, 14, 23, 45, 19, 3, 36, 9) )
+17 - l_partkey , l_quantity 
+18 - l_orderkey , l_quantity 
+19 - l_quantity, l_shipmode , l_shipinstruct
+20 - where ( n_name = 'CANADA' )
+
+

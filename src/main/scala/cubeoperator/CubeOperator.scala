@@ -15,7 +15,6 @@ object MyFunctions {
   
   def genMap(indicesToKeep:List[Int],currentRow:Row): collection.mutable.Map[Int,Any] = {
     var mapKey = collection.mutable.Map[Int,Any]();
-    println(currentRow);
     indicesToKeep.foreach( x=> mapKey +=  (x-> currentRow.get(x)));
     return mapKey
   }
@@ -136,7 +135,6 @@ class CubeOperator(reducers: Int) {
   
  
   def cube(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
-
     val rdd = dataset.getRDD()
     val schema = dataset.getSchema()
     println("Schema is below")
