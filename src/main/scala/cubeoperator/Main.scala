@@ -5,18 +5,9 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.expressions._
 import org.apache.spark.sql.functions._
 import java.io._
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{Row, SparkSession}
 
 
-object MyFunctions2 {
-  
-  def genMap(indicesToKeep:List[Int],currentRow:Row): collection.mutable.Map[Int,Any] = {
-    var mapKey = collection.mutable.Map[Int,Any]();
-    println(currentRow);
-    indicesToKeep.foreach( x=> mapKey +=  (x-> currentRow.get(x)));
-    return mapKey
-  }
-}
 object Main {
   def main(args: Array[String]) {
     val reducers = 10
@@ -45,7 +36,7 @@ object Main {
     //val rdd = dataset.getRDD()
     val nh = 1;
     val schema = df.schema.toList.map(x => x.name)
-    var groupingAttributes = List("lo_suppkey","lo_shipmode","lo_orderdate")
+    var groupingAttributes = List("lo_suppkey","lo_shipmode")
     println("Schema is below")
     println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
@@ -58,6 +49,10 @@ object Main {
     subsam.take(10).map(println)
     println(subsam.count())
     println(rdd.count())
+    val sc = SparkContext.getOrCreate()
+    val session = SparkSession.builder().getOrCreate();
+    val df_sub = session.createDataFrame(subsam.map(_._2), df.schema)
+    //df_sub.show()
      /*
     val rdd = df.rdd
     println("---RDD ---");

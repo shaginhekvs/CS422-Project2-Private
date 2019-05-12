@@ -3,12 +3,30 @@ package sampling
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-
+import scala.util.Try
+import scala.io.Source
 object Executor {
-  def execute_Q1(desc: Description, session: SparkSession, params: List[Any]) = {
+  
+  def parseBoolean(s: Any): Option[Boolean] = Try { s.toString.toBoolean }.toOption
+  
+  def execute_Q1(desc: Description, sqlContext : org.apache.spark.sql.SQLContext, params: List[Any]) = {
     // TODO: implement
     assert(params.size == 1)
     // For example, for Q1, params(0) is the interval from the where close
+    var s = ""
+    val bufferedSource = Source.fromFile("/home/ksingh/1_modified.sql")
+    print(desc.lineitem.schema) 
+    desc.samples(0).createOrReplaceTempView("lineitem");
+    for (line <- bufferedSource.getLines) {
+      s += line + "  "
+      println(line.toUpperCase)
+      }
+    bufferedSource.close
+    
+    val sqlDF = sqlContext.sql(s);
+    println("result of query")
+    sqlDF.show();
+    sqlDF.write.csv("/home/ksingh/1_result.csv")
   }
 
   def execute_Q3(desc: Description, session: SparkSession, params: List[Any]) = {
