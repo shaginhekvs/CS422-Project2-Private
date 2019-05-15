@@ -8,32 +8,36 @@ import java.io._
 import org.apache.spark.sql.{Row, SparkSession}
 
 
+
 object Main {
   def main(args: Array[String]) {
     val reducers = 10
 
-    val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
+    //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
     
     // option 1 
-    //val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
+    val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
     //val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"        
     //val input = new File(getClass.getResource(inputFile).getFile).getPath
-    //val sparkConf = new SparkConf().setAppName("CS422-Project2")
+    val sparkConf = new SparkConf().setAppName("CS422-Project2")
     
-    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
+    //val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)
-   //val df = sqlContext.read.option("delimiter", "|").parquet(inputFile);
+     val df = sqlContext.read.option("delimiter", "|").parquet(inputFile);
   
-  val df = sqlContext.read
-      .format("com.databricks.spark.csv")
-      .option("header", "true")
-      .option("inferSchema", "true")
-      .option("delimiter", "|")
-      .load(inputFile) 
+
       
-     val rdd = df.rdd
-    //val rdd = dataset.getRDD()
+    val rdd = df.rdd
+    val rdd_row = rdd.take(1) 
+    val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
+    val oos = new ObjectOutputStream(stream)
+    oos.writeObject(rdd_row)
+    print("size is ")
+    println(stream.size)
+     
+
+    /*
     val nh = 1;
     val schema = df.schema.toList.map(x => x.name)
     var groupingAttributes = List("lo_suppkey","lo_shipmode")
@@ -53,19 +57,19 @@ object Main {
     val session = SparkSession.builder().getOrCreate();
     val df_sub = session.createDataFrame(subsam.map(_._2), df.schema)
     //df_sub.show()
-     /*
-    val rdd = df.rdd
-    println("---RDD ---");
-    rdd.take(1000).map(println );
-    println("---RDD done ---");
+     */
+    
+    //println("---RDD ---");
+    //rdd.take(1000).map(println );
+    //println("---RDD done ---");
     val schema = df.schema.toList.map(x => x.name)
 
     val dataset = new Dataset(rdd, schema)
 
     val cb = new CubeOperator(reducers)
 
-    var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
-    //var groupingList = List("l_suppkey","l_shipmode","l_shipdate")
+    //var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
+    var groupingList = List("l_suppkey","l_shipmode","l_shipdate")
     println("fast")
     val res = cb.cube(dataset, groupingList, "l_quantity", "AVG")
     println("naive")
@@ -86,7 +90,6 @@ object Main {
         q1.show
 
        //println("cube here");
-        * 
-        */
+
   }
 }

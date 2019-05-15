@@ -1,0 +1,3 @@
+C:\Users\Dell\Documents\courses\2019\semA\DB\CS422-Project2-Private\tpch-dbgen-master\queries\1_modified.sql
+
+scp  C:\Users\Dell\Documents\courses\2019\semA\DB\CS422-Project2-Private\tpch-dbgen-master\queries\1_modified.sql ksingh@iccluster040.iccluster.epfl.ch:~

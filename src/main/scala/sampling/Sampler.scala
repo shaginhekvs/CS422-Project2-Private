@@ -2,10 +2,12 @@ package sampling
 import scala.util.control.Breaks._
 import java.lang.instrument.Instrumentation;
 import org.apache.spark.rdd.RDD
+import scala.collection.mutable.ListBuffer
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import scala.util.Try
+import java.io.{ByteArrayOutputStream, ObjectOutputStream}
 object MyFunctions {
   
   def parseDouble(s: Any): Option[Double] = Try { s.toString.toDouble }.toOption
@@ -24,7 +26,7 @@ object MyFunctions {
 }
 
 object SubSampler{
-  def subSample(df: DataFrame, groupingAttributes:List[String] , aggAttribute: String,nRows:Int,ci: Double):(DataFrame,Double,Double,Int,Int)={
+  def subSample(df: DataFrame, groupingAttributes:List[String] , aggAttribute: String,nRows:Int,ci: Double):(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double])={
     val schema = df.schema.toList.map(x => x.name)
     val rdd = df.rdd
     println("Schema is below")
@@ -88,7 +90,6 @@ object SubSampler{
     subsam_sigma.take(10).map(println)
     subsam_sigma_NH.take(10).map(println)
     println(se)
-    val sc = SparkContext.getOrCreate()
     val session = SparkSession.builder().getOrCreate();
     val df_sub = session.createDataFrame(subsam.map(_._2), df.schema)
     var z_map = collection.mutable.Map[Double,Double]();
@@ -98,7 +99,7 @@ object SubSampler{
     var z = z_map(0.95)
     var error_fract = -10.0;
     if(Math.abs(mean_sub)>0) error_fract = z*se/mean_sub;
-    return (df_sub,error_fract,se,nRowsFinal.toInt,se_sum._2._2);
+    return (df_sub,error_fract,se,nRowsFinal.toInt,se_sum._2._2,res);
     
   }
 }
@@ -106,16 +107,34 @@ object SubSampler{
 
 
 object Sampler {
-  def sample(lineitem: DataFrame, storageBudgetBytes: Long ,e:Double,ci: Double): (List[DataFrame], _) = {
+  def sample(lineitem: DataFrame, storageBudgetBytes: Long ,e:Double,ci: Double): (List[DataFrame], (List[Int],List[List[String]],List[Boolean],List[scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]])) = {
     // TODO: implement
+
+    val rdd = lineitem.rdd
+    val rdd_row = rdd.take(1) 
+    val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
+    val oos = new ObjectOutputStream(stream)
+    oos.writeObject(rdd_row)
+    var numRowsAllowed = storageBudgetBytes/stream.size
+    val listQueriesSamples = List(1,3)
+    val groupingAttributesAll = Map(1->List("l_returnflag","l_linestatus"),3->List("l_orderkey"))
+    val resultAll = collection.mutable.Map[Int,(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double])]()
+    val cantstoreAll = collection.mutable.Map[Int,Boolean]()
+    val estAttrAll = Map(1->"l_extendedprice",3->"l_extendedprice")
+    var listDF = new ListBuffer[DataFrame]()
+    var listGrouping = new ListBuffer[List[String]]()
+    var listBooleans = new ListBuffer[Boolean]()
+    var listAllCountFracs = new ListBuffer[scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]]()
+    for(v <- listQueriesSamples){
+      
+      
     var n:Int =  100;
     var cant_satisfy_error = false;
     var zeroMean = false;
-    var groupingAttributes = List("l_returnflag","l_linestatus")
-    var groupingAttributesLocal = List("lo_suppkey")
-    var estAttr = "l_extendedprice"
-    var estAttrLocal = "lo_supplycost"
-    var res:(DataFrame,Double,Double,Int,Int) = null;
+    var groupingAttributes = groupingAttributesAll(v)
+    var estAttr = estAttrAll(v)
+
+    var res:(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]) = null;
     
     do{
     res = SubSampler.subSample(lineitem,groupingAttributes,estAttr,n,ci);
@@ -123,12 +142,22 @@ object Sampler {
     n *= 2//Math.log(n).toInt 
     if(res._2<0) { zeroMean = true;}
     
-    if(n>res._5 || n > storageBudgetBytes) {cant_satisfy_error = true;}
+    if(n>res._5 || n > numRowsAllowed) {cant_satisfy_error = true;}
     println(res._2)
     println(n)
     }while(res._2>=e && res._2>0 && n<res._5);
     println(res._2)
     println(res._4)
-    return (List(res._1),res)
+    if(!cant_satisfy_error) numRowsAllowed -= res._4; // these many rows are used up
+    resultAll += ( v-> res); 
+    cantstoreAll += (v->cant_satisfy_error);
+    listDF += res._1
+    listGrouping += groupingAttributes
+    listBooleans += cant_satisfy_error
+    listAllCountFracs += res._6 
+    }
+
+    
+    return (listDF.toList,(listQueriesSamples,listGrouping.toList,listBooleans.toList,listAllCountFracs.toList))
   }
 }
