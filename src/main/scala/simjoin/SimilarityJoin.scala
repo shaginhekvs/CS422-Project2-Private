@@ -7,6 +7,7 @@ import org.apache.spark.sql.Row
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import scala.collection.mutable.ListBuffer
+import java.io._;
 
 object Levenshtein0 extends App {
  
@@ -113,7 +114,10 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     //println(overallRowSize)
     val duration = (System.currentTimeMillis() - t1) / 1000
     val final_rdd = rdd_verified.map(x=>(x._1.getString(0),x._2.getString(0)))
-    print("duration of cube naive is")
+    val pw = new PrintWriter(new File("/tmp/KeshavSimilarity.txt" ))
+    pw.write("duration of similarity is:  ")
+    pw.write(duration.toString)
+    pw.close
     println(duration)
     final_rdd
   }

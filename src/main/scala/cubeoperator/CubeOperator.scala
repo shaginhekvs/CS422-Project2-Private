@@ -3,6 +3,7 @@ package cubeoperator
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import scala.util.Try
+import java.io._;
 import scala.collection.mutable.ListBuffer
 class Key(var attrsIndex:Map[Int,Any]){
 
@@ -177,6 +178,10 @@ class CubeOperator(reducers: Int) {
 
   val duration = (System.currentTimeMillis() - t1) / 1000
   print("duration of cube is")
+  val pw = new PrintWriter(new File("/tmp/KeshavCube.txt" ))
+  pw.write("duration of cube is:  ")
+  pw.write(duration.toString)
+  pw.close
   println(duration)
   
   sorted
@@ -210,6 +215,10 @@ class CubeOperator(reducers: Int) {
     //afterMap.take(10).map(println);
     val duration = (System.currentTimeMillis() - t1) / 1000
     print("duration of cube naive is")
+    val pw = new PrintWriter(new File("/tmp/KeshavCubeNaive.txt" ))
+    pw.write("duration of cube is:  ")
+    pw.write(duration.toString)
+    pw.close
     println(duration)
     sorted
   }

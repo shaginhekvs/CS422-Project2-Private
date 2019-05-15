@@ -4,12 +4,19 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.random.RandomRDDs
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SparkSession}
+import java.io._
 import scala.io.Source
 object Main {
   def main(args: Array[String]) {
   
     //val conf = new SparkConf().setAppName("app").setMaster("local[*]")
     //val sc = SparkContext.getOrCreate()
+    // PrintWriter
+    
+  val pw = new PrintWriter(new File("/tmp/hello.txt" ))
+  pw.write("Hello, world")
+  pw.close
+
     val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)  
