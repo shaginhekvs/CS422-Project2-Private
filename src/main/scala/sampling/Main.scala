@@ -17,6 +17,7 @@ object Main {
     //val rdd = RandomRDDs.uniformRDD(sc, 100000)
 
     val inputFileLineItem = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
+    //val inputFileLineItem= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_small.tbl"
     val dfLineItem = sqlContext.read.option("delimiter", "|").parquet(inputFileLineItem);
     var desc = new Description
     desc.lineitem = dfLineItem
@@ -31,6 +32,8 @@ object Main {
 
     // Execute first query
     Executor.execute_Q1(desc, sqlContext, List("3 months"))
+    println("Query 1 executed")
+    
      //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
      //val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
     //val ctx = new SparkContext(sparkConf)
