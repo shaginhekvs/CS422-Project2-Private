@@ -93,7 +93,7 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
   
   
   def similarity_join(dataset: Dataset, attrIndex: Int) : RDD[(String, String)] = {
-    
+    val t1 = System.currentTimeMillis()
     val rdd = dataset.getRDD()
     
     // step 1: sampling
@@ -109,10 +109,13 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     val rdd_reduced = rdd_filtered.groupByKey();
     val rdd_verified = rdd_reduced.flatMap(x=>MyFunctions.verify(x._1,x._2,attrIndex,distThreshold))
     
-    rdd_verified.take(10).map(println );
-    println(overallRowSize)
-    
-    null
+    //rdd_verified.take(10).map(println );
+    //println(overallRowSize)
+    val duration = (System.currentTimeMillis() - t1) / 1000
+    val final_rdd = rdd_verified.map(x=>(x._1.getString(0),x._2.getString(0)))
+    print("duration of cube naive is")
+    println(duration)
+    final_rdd
   }
 }
 

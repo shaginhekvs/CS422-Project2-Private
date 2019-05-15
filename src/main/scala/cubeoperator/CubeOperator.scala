@@ -135,30 +135,32 @@ class CubeOperator(reducers: Int) {
   
  
   def cube(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
+    val t1 = System.currentTimeMillis()
+
     val rdd = dataset.getRDD()
     val schema = dataset.getSchema()
-    println("Schema is below")
-    println(schema)
+    //println("Schema is below")
+    //println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
-    println(index)
+    //println(index)
     val indexAgg = schema.indexOf(aggAttribute)
     val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),(MyFunctions.genValue(indexAgg,x,agg),1.0)));
-    mrspreadMap.take(10).map(println );
+    //mrspreadMap.take(10).map(println );
     val mrspreadCombine =  mrspreadMap.mapPartitions(it =>
     it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
       (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
     ).toIterator
   )
-  println("mrspread combine below")
+  //println("mrspread combine below")
   mrspreadCombine.take(10).map(println );
   
   val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
-  println("mrspread reduce below")
+  //println("mrspread reduce below")
   mrspreadReduce.take(10).map(println );  
   val mrspreadPartialCells = mrspreadReduce.flatMap((x)=>MyFunctions.genPartialCells(x._1,x._2._1,x._2._2));
-  println("mrspread partial cells below")
+  //println("mrspread partial cells below")
   mrspreadPartialCells.take(10).map(println); 
-  println("mrassemble combine");
+  //println("mrassemble combine");
   val mrAssembleCombine = mrspreadPartialCells.mapPartitions(it =>
     it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
       (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
@@ -168,16 +170,21 @@ class CubeOperator(reducers: Int) {
   
   val stringKey = mrAssembleReduce.map((x)=>MyFunctions.makeStringKey(x,index,agg))
   
-  mrAssembleReduce.take(10).map(println); 
+  //mrAssembleReduce.take(10).map(println); 
   //stringKey.take(10).map(println); 
   val sorted = stringKey.sortByKey();
-  sorted.take(10).map(println);
-  null
-    
+  //sorted.take(10).map(println);
+
+  val duration = (System.currentTimeMillis() - t1) / 1000
+  print("duration of cube is")
+  println(duration)
+  
+  sorted
+  
   }
 
   def cube_naive(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
-
+   val t1 = System.currentTimeMillis()
     val rdd = dataset.getRDD()
     val schema = dataset.getSchema()
     //rdd.take(10).map( x=> println(x.get(5)) );
@@ -198,11 +205,13 @@ class CubeOperator(reducers: Int) {
     val reduceRegions = afterMap.reduceByKey((x,y)=> {MyFunctionsNaive.accumulateFunc(x,y,agg)},reducers);
     val stringKey = reduceRegions.map((x)=>MyFunctions.makeStringKey(x,index,agg))
     val sorted = stringKey.sortByKey();
-    sorted.take(10).map(println);
+    //sorted.take(10).map(println);
     //println(allPartitions)
     //afterMap.take(10).map(println);
-    
-    null
+    val duration = (System.currentTimeMillis() - t1) / 1000
+    print("duration of cube naive is")
+    println(duration)
+    sorted
   }
 
 }
