@@ -17,6 +17,7 @@ object Main {
     //val rdd = RandomRDDs.uniformRDD(sc, 100000)
 
     val inputFileLineItem = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
+
     val inputFileNation = "/cs422-data/tpch/sf100/parquet/nation.parquet"
     val inputFileSupplier = "/cs422-data/tpch/sf100/parquet/supplier.parquet"
     val inputFileCustomer = "/cs422-data/tpch/sf100/parquet/customer.parquet"
@@ -32,6 +33,7 @@ object Main {
     val dfCustomer = sqlContext.read.option("delimiter", "|").parquet(inputFileCustomer);
 
     
+
     var desc = new Description
     desc.lineitem = dfLineItem
     desc.customer = sqlContext.read.option("delimiter", "|").parquet(inputFileCustomer);
@@ -49,8 +51,9 @@ object Main {
 
     // check storage usage for samples
 
-    // Execute first query
+
     Executor.execute_Q1(desc, sqlContext,session, List("3 months"))
+
      //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
      //val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
     //val ctx = new SparkContext(sparkConf)
