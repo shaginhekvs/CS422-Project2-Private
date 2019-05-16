@@ -112,8 +112,11 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     
     //rdd_verified.take(10).map(println );
     //println(overallRowSize)
-    val duration = (System.currentTimeMillis() - t1) / 1000
+    
     val final_rdd = rdd_verified.map(x=>(x._1.getString(0),x._2.getString(0)))
+    val duration = (System.currentTimeMillis() - t1) / 1000
+    println("number of rows are")
+    println(final_rdd.count());
     val pw = new PrintWriter(new File("/tmp/KeshavSimilarity.txt" ))
     pw.write("duration of similarity is:  ")
     pw.write(duration.toString)

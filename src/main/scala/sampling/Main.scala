@@ -13,11 +13,9 @@ object Main {
     //val sc = SparkContext.getOrCreate()
     // PrintWriter
     
-  val pw = new PrintWriter(new File("/tmp/hello.txt" ))
-  pw.write("Hello, world")
-  pw.close
 
     val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
+    sparkConf.set("spark.network.timeout", "600s")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)  
     val session = SparkSession.builder().getOrCreate();
@@ -52,7 +50,7 @@ object Main {
     desc.e = 0.1
     desc.ci = 0.95
 
-    val tmp = Sampler.sample(desc.lineitem, 10000000, desc.e, desc.ci)
+    val tmp = Sampler.sample(desc.lineitem, 1000000, desc.e, desc.ci)
     desc.samples = tmp._1
     desc.sampleDescription = tmp._2
 

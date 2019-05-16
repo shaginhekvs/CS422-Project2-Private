@@ -1,0 +1,3 @@
+similarity timing on cluster : 
+small : 159 sec
+10k : 163 sec
