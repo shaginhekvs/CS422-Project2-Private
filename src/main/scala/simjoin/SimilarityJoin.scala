@@ -114,7 +114,7 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     //println(overallRowSize)
     
     val final_rdd = rdd_verified.map(x=>(x._1.getString(attrIndex),x._2.getString(attrIndex)))
-    val duration = (System.currentTimeMillis() - t1) / 1000
+    val duration = (System.currentTimeMillis() - t1) / 1000.0
     println("number of rows are")
     println(final_rdd.count());
     val pw = new PrintWriter(new File("/tmp/KeshavSimilarity.txt" ))

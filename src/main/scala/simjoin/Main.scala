@@ -13,12 +13,16 @@ import java.io._
 
 object Main {
   def main(args: Array[String]) {     
-    val inputFile="../dblp_2k.csv"    
+    val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_1K_R.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_2K_R.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_5K_R.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_10K.csv"
+    //val inputFile="../dblp_2k.csv"    
     val numAnchors = 20
     val distanceThreshold = 1
     val attrIndex = 0    
         
-    val input = new File(getClass.getResource(inputFile).getFile).getPath    
+    //val input = new File(getClass.getResource(inputFile).getFile).getPath    
     val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)   
@@ -28,7 +32,7 @@ object Main {
     .option("header", "true")
     .option("inferSchema", "true")
     .option("delimiter", ",")
-    .load(input)      
+    .load(inputFile)      
 
     
     
