@@ -190,11 +190,10 @@ class CubeOperator(reducers: Int) {
 
   def cube_naive(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
    val t1 = System.currentTimeMillis()
-    val rdd = dataset.getRDD()
+    var rdd = dataset.getRDD()
+    rdd = rdd.repartition(reducers)
     val schema = dataset.getSchema()
-    //rdd.take(10).map( x=> println(x.get(5)) );
-    
-    //println(schema)
+
     val index = groupingAttributes.map(x => schema.indexOf(x))
     val indexAgg = schema.indexOf(aggAttribute)
     

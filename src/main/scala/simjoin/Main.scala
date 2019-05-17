@@ -13,31 +13,23 @@ import java.io._
 
 object Main {
   def main(args: Array[String]) {     
-    val inputFile="../dblp_small.csv"    
+    val inputFile="../dblp_6k.csv"    
     val numAnchors = 4
-    val distanceThreshold = 2
+    val distanceThreshold = 1
     val attrIndex = 0    
         
-    //val input = new File(getClass.getResource(inputFile).getFile).getPath    
+    val input = new File(getClass.getResource(inputFile).getFile).getPath    
     val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)   
     
-    /*
     val df = sqlContext.read
     .format("com.databricks.spark.csv")
     .option("header", "true")
     .option("inferSchema", "true")
     .option("delimiter", ",")
     .load(input)      
-    * 
-    */
-    val df = sqlContext.read
-    .format("com.databricks.spark.csv")
-    .option("header", "true")
-    .option("inferSchema", "true")
-    .option("delimiter", ",")
-    .parquet("/cs422-data/tpch/sf100/parquet/lineitem.parquet")
+
     
     
     val rdd = df.rdd        
