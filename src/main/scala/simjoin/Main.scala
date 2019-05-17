@@ -13,13 +13,13 @@ import java.io._
 
 object Main {
   def main(args: Array[String]) {     
-    val inputFile="../dblp_6k.csv"    
-    val numAnchors = 4
+    val inputFile="../dblp_2k.csv"    
+    val numAnchors = 20
     val distanceThreshold = 1
     val attrIndex = 0    
         
     val input = new File(getClass.getResource(inputFile).getFile).getPath    
-    val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
+    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)   
     

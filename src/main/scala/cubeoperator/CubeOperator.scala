@@ -212,6 +212,7 @@ class CubeOperator(reducers: Int) {
     //sorted.take(10).map(println);
     //println(allPartitions)
     //afterMap.take(10).map(println);
+    println("count of dataset is "+sorted.count().toString)
     val duration = (System.currentTimeMillis() - t1) / 1000
     print("duration of cube naive is")
     val pw = new PrintWriter(new File("/tmp/KeshavCubeNaive.txt" ))

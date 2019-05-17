@@ -113,7 +113,7 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     //rdd_verified.take(10).map(println );
     //println(overallRowSize)
     
-    val final_rdd = rdd_verified.map(x=>(x._1.getString(0),x._2.getString(0)))
+    val final_rdd = rdd_verified.map(x=>(x._1.getString(attrIndex),x._2.getString(attrIndex)))
     val duration = (System.currentTimeMillis() - t1) / 1000
     println("number of rows are")
     println(final_rdd.count());
