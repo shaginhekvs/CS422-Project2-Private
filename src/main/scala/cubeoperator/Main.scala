@@ -11,22 +11,38 @@ import org.apache.spark.sql.{Row, SparkSession}
 
 object Main {
   def main(args: Array[String]) {
-    val reducers = 10
+    // test different input sizes with reducers = 16
+    val reducers = 16
 
     //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
+    val inputFile0= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_small_half.tbl"
+    val inputFile1= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_small.tbl"
+    
+    val inputFile2= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_medium_half.tbl"
+    val inputFile3= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_medium.tbl"
+    
+    val inputFile4= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_big_half.tbl"
+    val inputFile5= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_big.tbl"
+    
     
     // option 1 
-    val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
+    //val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
     //val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"        
     //val input = new File(getClass.getResource(inputFile).getFile).getPath
-    val sparkConf = new SparkConf().setAppName("CS422-Project2")
+    //val sparkConf = new SparkConf().setAppName("CS422-Project2")
     
-    //val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
+    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)
-     val df = sqlContext.read.option("delimiter", "|").parquet(inputFile);
+    //val df = sqlContext.read.option("delimiter", "|").parquet(inputFile);
   
 
+    val df = sqlContext.read
+    .format("com.databricks.spark.csv")
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .option("delimiter", "|")
+    .load(inputFile0)
       
     val rdd = df.rdd
     val rdd_row = rdd.take(1) 
@@ -68,12 +84,15 @@ object Main {
 
     val cb = new CubeOperator(reducers)
 
-    //var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
-    var groupingList = List("l_suppkey","l_shipmode","l_shipdate")
+    // Local schema lo_orderkey, lo_linenumber, lo_custkey, lo_partkey, lo_suppkey, lo_orderdate, lo_orderpriority, lo_shippriority, lo_quantity, lo_extendedprice, lo_ordertotalprice, lo_discount, lo_revenue, lo_supplycost, lo_tax, lo_commitdate, lo_shipmode)
+    // Local test
+    var groupingList = List("lo_suppkey","lo_shipmode","lo_orderdate")
+    // Cluster test
+    //var groupingList = List("l_suppkey","l_shipmode","l_shipdate")
     println("fast")
-    val res = cb.cube(dataset, groupingList, "l_quantity", "AVG")
+    val res = cb.cube(dataset, groupingList, "lo_quantity", "AVG")
     println("naive")
-    val res2 = cb.cube_naive(dataset, groupingList, "l_quantity", "AVG")
+    val res2 = cb.cube_naive(dataset, groupingList, "lo_quantity", "AVG")
 
     /*
        The above call corresponds to the query:
@@ -84,11 +103,13 @@ object Main {
 
 
     //Perform the same query using SparkSQL
-
+        val tsql = System.currentTimeMillis()
         val q1 = df.cube("lo_suppkey","lo_shipmode","lo_orderdate")
           .agg(sum("lo_supplycost") as "avg supplycost");
         q1.show
-
+        val duration = (System.currentTimeMillis() - tsql) / 1000.0
+        print("duration of SparkSQL cube is: ")
+        println(duration)
        //println("cube here");
 
   }

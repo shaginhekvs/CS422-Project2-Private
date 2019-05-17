@@ -117,7 +117,7 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     val duration = (System.currentTimeMillis() - t1) / 1000.0
     println("number of rows are")
     println(final_rdd.count());
-    val pw = new PrintWriter(new File("/tmp/KeshavSimilarity.txt" ))
+    val pw = new PrintWriter(new File("similarity.txt" ))
     pw.write("duration of similarity is:  ")
     pw.write(duration.toString)
     pw.close

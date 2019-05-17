@@ -13,12 +13,21 @@ import java.io._
 
 object Main {
   def main(args: Array[String]) {     
-    val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_1K_R.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_1K_R.csv"
     //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_2K_R.csv"
     //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_5K_R.csv"
-    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_10K.csv"
+    
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_2K.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_4K.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_6K.csv"
+    //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_8K.csv"
+    val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_10K.csv"
+    
     //val inputFile="../dblp_2k.csv"    
-    val numAnchors = 20
+    
+    // try  4,10,20,30,50
+    val numAnchors = 10
+    // distanceThreshold 1 3
     val distanceThreshold = 1
     val attrIndex = 0    
         
