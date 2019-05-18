@@ -53,6 +53,8 @@ object Main {
     desc.supplier = sqlContext.read.option("delimiter", "|").parquet(inputFileSupplier);
     desc.nation = sqlContext.read.option("delimiter", "|").parquet(inputFileNation);
     desc.region = sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
+    //desc.part = sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
+    //desc.partsupp= sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
     
     desc.e = 0.1
     desc.ci = 0.95

@@ -111,8 +111,10 @@ object Executor {
     
     val s: String = qs.q3
     var query = ExecutorHelpers.multipleReplace(s, params)
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
+    if(!desc.sampleDescription._3(1)){ // index of query
+      desc.samples(1).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -129,7 +131,6 @@ object Executor {
   }
 
   def execute_Q5(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
-       // define right param. number
     assert(params.size == 2)
     
     ////val qs = new Queries
@@ -137,9 +138,15 @@ object Executor {
     
     val s = qs.q5
     var query = ExecutorHelpers.multipleReplace(s, params)
+
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
+    desc.supplier.createOrReplaceTempView("supplier");
+    desc.nation.createOrReplaceTempView("nation");
+    desc.region.createOrReplaceTempView("region");
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    if(!desc.sampleDescription._3(2)){
+      desc.samples(2).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -147,8 +154,8 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    if(!desc.sampleDescription._3(2)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1) // here?
     }
     println("result of query 5")
     sqlDF.show()
@@ -163,8 +170,8 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    if(!desc.sampleDescription._3(3)){
+      desc.samples(3).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -187,9 +194,14 @@ object Executor {
     val s = qs.q7
     
     var query = ExecutorHelpers.multipleReplace(s, params)
+
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
+    desc.supplier.createOrReplaceTempView("supplier");
+    desc.nation.createOrReplaceTempView("nation");
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    if(!desc.sampleDescription._3(4)){
+      desc.samples(4).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -197,7 +209,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(1)){ // here?
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 7")
@@ -213,8 +225,14 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.orders.createOrReplaceTempView("orders");
+    desc.supplier.createOrReplaceTempView("supplier");
+    desc.nation.createOrReplaceTempView("nation");
+    //desc.part.createOrReplaceTempView("part");
+    //desc.partsupp.createOrReplaceTempView("partsupp");
+    
+    if(!desc.sampleDescription._3(5)){
+      desc.samples(5).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -234,12 +252,16 @@ object Executor {
     assert(params.size == 1)
     //val qs = new Queries
     val qs = new GQueries  
-    val s = qs.q6
+    val s = qs.q10
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
+    desc.nation.createOrReplaceTempView("nation");
+    
+    if(!desc.sampleDescription._3(6)){
+      desc.samples(6).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -261,18 +283,16 @@ object Executor {
     val qs = new GQueries  
     val s = qs.q11
     
+    //desc.partsupp.createOrReplaceTempView("partsupp");
+    desc.supplier.createOrReplaceTempView("supplier");
+    desc.nation.createOrReplaceTempView("nation");
+    
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
-    }
-    else{
-      desc.lineitem.createOrReplaceTempView("lineitem");
-    }
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(7)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 11")
@@ -288,8 +308,10 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.orders.createOrReplaceTempView("orders");
+    
+    if(!desc.sampleDescription._3(8)){
+      desc.samples(8).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -297,7 +319,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(8)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 12")
@@ -313,8 +335,10 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    //desc.part.createOrReplaceTempView("part");
+    
+    if(!desc.sampleDescription._3(9)){
+      desc.samples(9).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -322,7 +346,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(9)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 17")
@@ -338,8 +362,11 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
+    
+    if(!desc.sampleDescription._3(10)){
+      desc.samples(10).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -347,7 +374,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(10)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 18")
@@ -363,8 +390,10 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    //desc.part.createOrReplaceTempView("part");
+    
+    if(!desc.sampleDescription._3(11)){
+      desc.samples(11).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -372,7 +401,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(11)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 19")
@@ -388,8 +417,12 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+    desc.supplier.createOrReplaceTempView("supplier");
+    desc.nation.createOrReplaceTempView("nation");
+    //desc.partsupp.createOrReplaceTempView("partsupp");
+    
+    if(!desc.sampleDescription._3(12)){
+      desc.samples(12).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
@@ -397,7 +430,7 @@ object Executor {
     
     //var sqlDF = sqlContext.sql(s);
     var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
+    if(!desc.sampleDescription._3(12)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
     println("result of query 20")
