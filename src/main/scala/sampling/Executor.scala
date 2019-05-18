@@ -7,7 +7,22 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import scala.util.Try
 import scala.io.Source
 import org.apache.spark.sql.{Row, SparkSession}
+import scala.util.matching.Regex
+import cubeoperator.MyFunctions
+
 object ExecutorHelpers {
+  
+  
+  def multipleReplace(text: String, params: List[Any]): String ={
+    var modtext: String = text 
+    for (i<- 0 to params.size + 1 ){
+      var ch: String = ":" + (i+1).toString();
+      var index = i+1
+      modtext = modtext.replaceAll(ch, params(index).toString())
+    }
+    return modtext
+  }
+  
   def scaleOutput(thisRow:(collection.mutable.Map[Int,Any],Row),all_index:List[Int],index_vals:List[Int] , NHMap:scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]):(collection.mutable.Map[Int,Any],Row) = {
    var scale_const = 1.0;
    NHMap.keySet.foreach(x=>{
@@ -47,7 +62,7 @@ object Executor {
   
   
   def execute_Q1(desc: Description, sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+    
     assert(params.size == 1)
     // For example, for Q1, params(0) is the interval from the where close
     /*
@@ -61,7 +76,8 @@ object Executor {
       }
     bufferedSource.close
     */
-    val qs = new Queries 
+    //////val qs = new Queries
+    val qs = new GQueries 
     val s = qs.q1
     if(!desc.sampleDescription._3(0)){
       desc.samples(0).createOrReplaceTempView("lineitem");
@@ -69,7 +85,10 @@ object Executor {
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
     var sqlDF = sqlContext.sql(s);
+    //var sqlDF = sqlContext.sql(query);
     if(!desc.sampleDescription._3(0)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,0)
     }
@@ -80,21 +99,26 @@ object Executor {
   }
 
   def execute_Q3(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+    
     assert(params.size == 2)
     // https://github.com/electrum/tpch-dbgen/blob/master/queries/3.sql
     // using:
     // params(0) as :1
     // params(1) as :2
-    val qs = new Queries 
-    val s = qs.q3
+    
+    ////val qs = new Queries
+    val qs = new GQueries 
+    
+    val s: String = qs.q3
+    var query = ExecutorHelpers.multipleReplace(s, params)
     if(!desc.sampleDescription._3(1)){
       desc.samples(0).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
-    var sqlDF = sqlContext.sql(s);
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
     if(!desc.sampleDescription._3(1)){
       sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
     }
@@ -104,47 +128,279 @@ object Executor {
     
   }
 
-  def execute_Q5(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q5(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+       // define right param. number
+    assert(params.size == 2)
+    
+    ////val qs = new Queries
+    val qs = new GQueries
+    
+    val s = qs.q5
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 5")
+    sqlDF.show()
   }
 
-  def execute_Q6(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q6(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 3)
+    ////val qs = new Queries
+    val qs = new GQueries   
+    val s = qs.q6
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 6")
+    sqlDF.show()
   }
 
-  def execute_Q7(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+    def execute_Q7(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 2)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q7
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 7")
+    sqlDF.show()
   }
 
-  def execute_Q9(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q9(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 1)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q9
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 9")
+    sqlDF.show()
   }
 
-  def execute_Q10(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q10(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 1)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q6
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 10")
+    sqlDF.show()
   }
 
-  def execute_Q11(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_11(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 2)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q11
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 11")
+    sqlDF.show()
   }
 
-  def execute_Q12(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q12(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 3)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q12
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 12")
+    sqlDF.show()
   }
 
-  def execute_Q17(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q17(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 2)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q17
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 17")
+    sqlDF.show()
   }
 
-  def execute_Q18(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q18(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 1)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q18
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 18")
+    sqlDF.show()
   }
 
-  def execute_Q19(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q19(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 6)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q19
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 19")
+    sqlDF.show()
   }
 
-  def execute_Q20(desc: Description, session: SparkSession, params: List[Any]) = {
-    // TODO: implement
+  def execute_Q20(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+    
+    assert(params.size == 3)
+    //val qs = new Queries
+    val qs = new GQueries  
+    val s = qs.q20
+    
+    var query = ExecutorHelpers.multipleReplace(s, params)
+    
+    if(!desc.sampleDescription._3(1)){
+      desc.samples(0).createOrReplaceTempView("lineitem");
+    }
+    else{
+      desc.lineitem.createOrReplaceTempView("lineitem");
+    }
+    
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(1)){
+      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    }
+    println("result of query 20")
+    sqlDF.show()
   }
 }
