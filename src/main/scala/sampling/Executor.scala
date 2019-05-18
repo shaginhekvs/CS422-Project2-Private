@@ -17,8 +17,7 @@ object ExecutorHelpers {
     var modtext: String = text 
     for (i<- 0 to params.size + 1 ){
       var ch: String = ":" + (i+1).toString();
-      var index = i+1
-      modtext = modtext.replaceAll(ch, params(index).toString())
+      modtext = modtext.replaceAll(ch, params(i).toString())
     }
     return modtext
   }
