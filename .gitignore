@@ -8,3 +8,6 @@ project/target
 project/project
 .cache-tests
 .DS_Store
+src/main/resources/lineorder_big.tbl
+src/main/resources/lineorder_big1M.tbl
+src/main/resources/lineorder_big_half.tbl

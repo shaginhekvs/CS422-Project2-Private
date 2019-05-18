@@ -6,6 +6,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Row, SparkSession}
 import java.io._
 import scala.io.Source
+
 object Main {
   def main(args: Array[String]) {
   
