@@ -76,7 +76,8 @@ object Executor {
       }
     bufferedSource.close
     */
-    val qs = new Queries 
+    //////val qs = new Queries
+    val qs = new GQueries 
     val s = qs.q1
     if(!desc.sampleDescription._3(0)){
       desc.samples(0).createOrReplaceTempView("lineitem");
@@ -104,7 +105,10 @@ object Executor {
     // using:
     // params(0) as :1
     // params(1) as :2
-    val qs = new Queries 
+    
+    ////val qs = new Queries
+    val qs = new GQueries 
+    
     val s: String = qs.q3
     var query = ExecutorHelpers.multipleReplace(s, params)
     if(!desc.sampleDescription._3(1)){
@@ -127,7 +131,10 @@ object Executor {
   def execute_Q5(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
        // define right param. number
     assert(params.size == 2)
-    val qs = new Queries 
+    
+    ////val qs = new Queries
+    val qs = new GQueries
+    
     val s = qs.q5
     var query = ExecutorHelpers.multipleReplace(s, params)
     
@@ -150,7 +157,8 @@ object Executor {
   def execute_Q6(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 3)
-    val qs = new Queries 
+    ////val qs = new Queries
+    val qs = new GQueries   
     val s = qs.q6
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -174,7 +182,8 @@ object Executor {
     def execute_Q7(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 2)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q7
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -198,7 +207,8 @@ object Executor {
   def execute_Q9(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 1)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q9
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -222,7 +232,8 @@ object Executor {
   def execute_Q10(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 1)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q6
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -246,7 +257,8 @@ object Executor {
   def execute_11(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 2)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q11
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -270,7 +282,8 @@ object Executor {
   def execute_Q12(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 3)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q12
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -294,7 +307,8 @@ object Executor {
   def execute_Q17(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 2)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q17
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -318,7 +332,8 @@ object Executor {
   def execute_Q18(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 1)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q18
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -342,7 +357,8 @@ object Executor {
   def execute_Q19(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 6)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q19
     
     var query = ExecutorHelpers.multipleReplace(s, params)
@@ -366,7 +382,8 @@ object Executor {
   def execute_Q20(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 3)
-    val qs = new Queries 
+    //val qs = new Queries
+    val qs = new GQueries  
     val s = qs.q20
     
     var query = ExecutorHelpers.multipleReplace(s, params)
