@@ -15,9 +15,10 @@ object ExecutorHelpers {
   
   def multipleReplace(text: String, params: List[Any]): String ={
     var modtext: String = text 
-    for (i<- 0 to params.size + 1 ){
-      var ch: String = ":" + (i+1).toString();
-      modtext = modtext.replaceAll(ch, params(i).toString())
+    println(params.size)
+    for (i<- 1 to params.size){
+      var ch: String = ":" + (i).toString();
+      modtext = modtext.replaceAll(ch, params(i-1).toString())
     }
     return modtext
   }

@@ -45,7 +45,7 @@ object Main {
     .option("header", "true")
     .option("inferSchema", "true")
     .option("delimiter", "|")
-    .load(inputFile3)
+    .load(inputFile4)
       
     val rdd = df.rdd
     val rdd_row = rdd.take(1) 

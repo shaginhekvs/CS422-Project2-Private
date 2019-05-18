@@ -1,1 +1,1 @@
-duration of cube is:  151.538
+duration of cube is:  340.813
