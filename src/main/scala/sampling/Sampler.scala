@@ -28,7 +28,7 @@ object MyFunctions {
 object SubSampler{
   def subSample(df: DataFrame, groupingAttributes:List[String] , aggAttribute: String,nRows:Int,ci: Double):(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double])={
     val schema = df.schema.toList.map(x => x.name)
-    val rdd = df.rdd
+    var rdd = df.rdd
     println("Schema is below")
     println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
@@ -111,7 +111,7 @@ object Sampler {
     // TODO: implement
     val pw = new PrintWriter(new File("/tmp/KeshavSampler.txt" ))
     pw.write("sampler is:  ")
-
+   
     val rdd = lineitem.rdd
     val rdd_row = rdd.take(1) 
     val stream: ByteArrayOutputStream = new ByteArrayOutputStream()
@@ -128,19 +128,26 @@ object Sampler {
     var listGrouping = new ListBuffer[List[String]]()
     var listBooleans = new ListBuffer[Boolean]()
     var listAllCountFracs = new ListBuffer[scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]]()
-    for(v <- listQueriesSamples){
-      
-    pw.write("reading now is:  "+v+"\n") 
     var n:Int =  100;
     var cant_satisfy_error = false;
     var zeroMean = false;
-    var groupingAttributes = groupingAttributesAll(v)
-    var estAttr = estAttrAll(v)
+    var groupingAttributes = groupingAttributesAll(1)
+    var estAttr = estAttrAll(1)
+    val session = SparkSession.builder().getOrCreate();
+    val df_use = session.createDataFrame(lineitem.rdd.sample(false, 0.15, 100), lineitem.schema)
+    for(v <- listQueriesSamples){
+      
+    pw.write("reading now is:  "+v+"\n") 
+    n =  100;
+    cant_satisfy_error = false;
+    zeroMean = false;
+    groupingAttributes = groupingAttributesAll(v)
+    estAttr = estAttrAll(v)
 
     var res:(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]) = null;
     
     do{
-    res = SubSampler.subSample(lineitem,groupingAttributes,estAttr,n,ci);
+    res = SubSampler.subSample(df_use,groupingAttributes,estAttr,n,ci);
     if(n<=res._4) n = res._4
     n *= 2//Math.log(n).toInt 
     if(res._2<0) { zeroMean = true;}
@@ -150,7 +157,7 @@ object Sampler {
     pw.write("error:  "+res._2.toString+"\n") 
     pw.write("n:  "+n.toString+"\n") 
     println(n)
-    }while(res._2>=e && res._2>0 && n<res._5);
+    }while(res._2>=e && res._2>0 && n<res._5 && n < numRowsAllowed);
     println(res._2)
     println(res._4)
     pw.write("done now res is:  "+res._2+","+res._4+"\n") 

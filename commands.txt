@@ -1,3 +1,14 @@
 C:\Users\Dell\Documents\courses\2019\semA\DB\CS422-Project2-Private\tpch-dbgen-master\queries\1_modified.sql
 
+sbt package 
+
 scp  C:\Users\Dell\Documents\courses\2019\semA\DB\CS422-Project2-Private\tpch-dbgen-master\queries\1_modified.sql ksingh@iccluster040.iccluster.epfl.ch:~
+
+scp C:\Users\Dell\Documents\courses\2019\semA\DB\CS422-Project2-Private\target\scala-2.11\cs422-project2_2.11-0.1.0.jar ksingh@iccluster040.iccluster.epfl.ch:~
+
+ssh ksingh@iccluster040.iccluster.epfl.ch
+
+spark-submit --master yarn --class sampling.Main --executor-memory 10g --executor-cores 4 --num-executors 4 --conf spark.network.timeout=10000000 --conf spark.executor.heartbeatInterval=1000000 cs422-project2_2.11-0.1.0.jar
+
+
+spark-submit --master yarn --class simjoin.Main --executor-memory 10g --executor-cores 4 --num-executors 4 cs422-project2_2.11-0.1.0.jar

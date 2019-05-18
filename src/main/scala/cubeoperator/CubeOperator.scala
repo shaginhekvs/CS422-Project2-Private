@@ -147,27 +147,35 @@ class CubeOperator(reducers: Int) {
     val indexAgg = schema.indexOf(aggAttribute)
     val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),(MyFunctions.genValue(indexAgg,x,agg),1.0)));
     //mrspreadMap.take(10).map(println );
+    /*
     val mrspreadCombine =  mrspreadMap.mapPartitions(it =>
     it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
       (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
     ).toIterator
   )
+  * 
+  */
   //println("mrspread combine below")
-  mrspreadCombine.take(10).map(println );
+  //mrspreadCombine.take(10).map(println );
   
-  val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
+  //val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
+  val mrspreadReduce = mrspreadMap.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
   //println("mrspread reduce below")
-  mrspreadReduce.take(10).map(println );  
+  //mrspreadReduce.take(10).map(println );  
   val mrspreadPartialCells = mrspreadReduce.flatMap((x)=>MyFunctions.genPartialCells(x._1,x._2._1,x._2._2));
   //println("mrspread partial cells below")
-  mrspreadPartialCells.take(10).map(println); 
+  //mrspreadPartialCells.take(10).map(println); 
   //println("mrassemble combine");
+ /*
   val mrAssembleCombine = mrspreadPartialCells.mapPartitions(it =>
     it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
       (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
     ).toIterator
   )
-  val mrAssembleReduce = mrAssembleCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers)
+  * *
+  */
+  
+  val mrAssembleReduce = mrspreadPartialCells.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers)
   
   val stringKey = mrAssembleReduce.map((x)=>MyFunctions.makeStringKey(x,index,agg))
   

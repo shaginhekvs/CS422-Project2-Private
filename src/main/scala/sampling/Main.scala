@@ -15,7 +15,7 @@ object Main {
     
 
     val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
-    sparkConf.set("spark.network.timeout", "600s")
+    //sparkConf.set("spark.network.timeout", "3600s")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)  
     val session = SparkSession.builder().getOrCreate();
