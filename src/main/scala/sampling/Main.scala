@@ -14,6 +14,10 @@ object Main {
     //val sc = SparkContext.getOrCreate()
     // PrintWriter
     
+    //val qs = new GQueries 
+    //val s = qs.q1
+    //var params = List("3 months")
+    //var query = ExecutorHelpers.multipleReplace(s, params)
 
     val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
     //sparkConf.set("spark.network.timeout", "3600s")

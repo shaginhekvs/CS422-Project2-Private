@@ -8,7 +8,7 @@ import scala.util.Try
 import scala.io.Source
 import org.apache.spark.sql.{Row, SparkSession}
 import scala.util.matching.Regex
-import cubeoperator.MyFunctions
+
 
 object ExecutorHelpers {
   
@@ -17,8 +17,7 @@ object ExecutorHelpers {
     var modtext: String = text 
     for (i<- 0 to params.size + 1 ){
       var ch: String = ":" + (i+1).toString();
-      var index = i+1
-      modtext = modtext.replaceAll(ch, params(index).toString())
+      modtext = modtext.replaceAll(ch, params(i).toString())
     }
     return modtext
   }
@@ -76,8 +75,8 @@ object Executor {
       }
     bufferedSource.close
     */
-    //////val qs = new Queries
-    val qs = new GQueries 
+    val qs = new Queries
+    //val qs = new GQueries 
     val s = qs.q1
     if(!desc.sampleDescription._3(0)){
       desc.samples(0).createOrReplaceTempView("lineitem");
@@ -85,7 +84,7 @@ object Executor {
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
-    var query = ExecutorHelpers.multipleReplace(s, params)
+    //var query = ExecutorHelpers.multipleReplace(s, params)
     
     var sqlDF = sqlContext.sql(s);
     //var sqlDF = sqlContext.sql(query);
@@ -108,7 +107,8 @@ object Executor {
     
     ////val qs = new Queries
     val qs = new GQueries 
-    
+    desc.customer.createOrReplaceTempView("customer");
+    desc.orders.createOrReplaceTempView("orders");
     val s: String = qs.q3
     var query = ExecutorHelpers.multipleReplace(s, params)
     if(!desc.sampleDescription._3(1)){
