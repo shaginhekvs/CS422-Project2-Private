@@ -24,13 +24,7 @@ object Levenshtein0 extends App {
  
     dist(s2.length)(s1.length)
   }
- 
-  def printDistance(s1: String, s2: String) {
-    println("%s -> %s : %d".format(s1, s2, distance(s1, s2)))
-  }
- 
-  printDistance("kitten", "sitting")
-  printDistance("rosettacode", "raisethysword")
+
  
 }
 
@@ -47,7 +41,7 @@ object MyFunctions {
     
     var curList = new ListBuffer[(Int,(Int,Row))](); 
     curList += ((homeAnchor, (0,currentRow)));
-    outer_anchors.foreach((k)=>curList += ((k._1,(1,currentRow)))) // more optimization possible acc to hashing , not sure if it works though
+    outer_anchors.foreach((k)=>{curList += ((k._1,(1,currentRow)))}) // more optimization possible acc to hashing , not sure if it works though
     
     return curList;
     }
@@ -115,15 +109,7 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     
     val final_rdd = rdd_verified.map(x=>(x._1.getString(attrIndex),x._2.getString(attrIndex)))
     val final_rdd_filtered = final_rdd.filter(x=>(x._1 != x._2)).distinct()
-    val duration = (System.currentTimeMillis() - t1) / 1000.0
-    println("number of rows are")
-    println(final_rdd_filtered.count());
-    val pw = new PrintWriter(new File("./KeshavSimilarity.txt" ))
 
-    pw.write("duration of similarity is:  ")
-    pw.write(duration.toString)
-    pw.close
-    println(duration)
     final_rdd
   }
 }

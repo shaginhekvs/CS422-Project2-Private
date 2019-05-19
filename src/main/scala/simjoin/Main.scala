@@ -24,7 +24,7 @@ object Main {
     //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_6K.csv"
     //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_8K.csv"
     //val inputFile= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/dblp_10K.csv"
-    val inputFile= "./src/main/resources/dblp_2K.csv"
+    val inputFile= "./src/main/resources/dblp_small.csv"
     
     //val inputFile="../dblp_2k.csv"    
     
@@ -35,7 +35,7 @@ object Main {
     val attrIndex = 0    
         
     //val input = new File(getClass.getResource(inputFile).getFile).getPath    
-    val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
+    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[*]")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)   
     

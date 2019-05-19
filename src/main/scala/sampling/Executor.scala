@@ -197,13 +197,7 @@ object Executor {
     paramsNew += params(2).toString
     paramsNew += LocalDate.parse(paramsDate).plusYears(1).toString
     var query = ExecutorHelpers.multipleReplace(s, paramsNew.toList)
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+
     if(!desc.sampleDescription._3(10)){
       desc.samples(3).createOrReplaceTempView("lineitem");
     }
@@ -213,10 +207,9 @@ object Executor {
     
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
-    println("result of query")
+    println("result of query 5")
     res.take(10).map(println)
-    * 
-    */
+
     res
   }
   
@@ -235,13 +228,7 @@ object Executor {
     desc.orders.createOrReplaceTempView("orders");
     desc.supplier.createOrReplaceTempView("supplier");
     desc.nation.createOrReplaceTempView("nation");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    
     if(!desc.sampleDescription._3(3)){
       desc.samples(3).createOrReplaceTempView("lineitem");
     }
@@ -253,15 +240,14 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
-    println("result of query")
+    println("result of query 7 ")
     res.take(10).map(println)
-    * 
-    */
+
     res
   
    }
 
-  def execute_Q9(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
+def execute_Q9(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
     
     assert(params.size == 1)
     //val qs = new Queries
@@ -275,13 +261,7 @@ object Executor {
     desc.nation.createOrReplaceTempView("nation");
     desc.part.createOrReplaceTempView("part");
     desc.partsupp.createOrReplaceTempView("partsupp");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    
     if(!desc.sampleDescription._3(10)){
       desc.samples(10).createOrReplaceTempView("lineitem");
     }
@@ -292,10 +272,8 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
-    println("result of query")
+    println("result of query 9")
     res.take(10).map(println)
-    * 
-    */
     res
   }
 
@@ -309,19 +287,14 @@ object Executor {
     var paramsDate = params(0).toString
     paramsNew += params(0).toString
     paramsNew += LocalDate.parse(paramsDate).plusYears(1).toString
+    println(paramsNew)
     var query = ExecutorHelpers.multipleReplace(s, paramsNew.toList)
     
     desc.customer.createOrReplaceTempView("customer");
     desc.orders.createOrReplaceTempView("orders");
     desc.nation.createOrReplaceTempView("nation");
 
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+
     
     if(!desc.sampleDescription._3(4)){
       desc.samples(4).createOrReplaceTempView("lineitem");
@@ -333,10 +306,8 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
+    println("result of query 10")
     res.take(10).map(println)
-    * 
-    */
     res
   }
 
@@ -357,9 +328,8 @@ object Executor {
 
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
 
-    println("result of query")
+    println("result of query 11")
     res.take(10).map(println)
     res
   }
@@ -379,13 +349,7 @@ object Executor {
     var query = ExecutorHelpers.multipleReplace(s, paramsNew.toList)
     
     desc.orders.createOrReplaceTempView("orders");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+
     
     if(!desc.sampleDescription._3(8)){
       desc.samples(8).createOrReplaceTempView("lineitem");
@@ -395,16 +359,14 @@ object Executor {
     }
     
 
-    //var sqlDF = sqlContext.sql(s);
 
     
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
 
-    println("result of query")
+    println("result of query 12")
     res.take(10).map(println)
-    * 
-    */
+
     res
   }
 
@@ -417,14 +379,8 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    //desc.part.createOrReplaceTempView("part");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    desc.part.createOrReplaceTempView("part");
+
     if(!desc.sampleDescription._3(9)){
       desc.samples(9).createOrReplaceTempView("lineitem");
     }
@@ -437,10 +393,9 @@ object Executor {
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
 
-    println("result of query")
+    println("result of query 17")
     res.take(10).map(println)
-    * 
-    */
+
     res
   }
 
@@ -455,13 +410,7 @@ object Executor {
     
     desc.customer.createOrReplaceTempView("customer");
     desc.orders.createOrReplaceTempView("orders");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    
     if(!desc.sampleDescription._3(10)){
       desc.samples(10).createOrReplaceTempView("lineitem");
     }
@@ -473,10 +422,8 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
-    println("result of query")
+    println("result of query 18 ")
     res.take(10).map(println)
-    * 
-    */
     res
   }
 
@@ -489,14 +436,9 @@ object Executor {
     
     var query = ExecutorHelpers.multipleReplace(s, params)
     
-    //desc.part.createOrReplaceTempView("part");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    desc.part.createOrReplaceTempView("part");
+
+    
     if(!desc.sampleDescription._3(11)){
       desc.samples(11).createOrReplaceTempView("lineitem");
     }
@@ -507,10 +449,8 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
-    println("result of query")
+    println("result of query 19")
     res.take(10).map(println)
-    * 
-    */
     res
   }
 
@@ -530,14 +470,9 @@ object Executor {
     
     desc.supplier.createOrReplaceTempView("supplier");
     desc.nation.createOrReplaceTempView("nation");
+    desc.part.createOrReplaceTempView("part");
     desc.partsupp.createOrReplaceTempView("partsupp");
-    desc.lineitem.createOrReplaceTempView("lineitem");
-    var sqlDF = sqlContext.sql(query);
-    var res = sqlDF.rdd
-    //var sqlDF = sqlContext.sql(query);
-    println("result of query 7 ")
-    res.take(10).map(println)
-    /*
+    
     if(!desc.sampleDescription._3(12)){
       desc.samples(12).createOrReplaceTempView("lineitem");
     }
@@ -550,10 +485,9 @@ object Executor {
     var sqlDF = sqlContext.sql(query);
     var res = sqlDF.rdd
 
-    println("result of query is below ")
+    println("result of query 20 is below ")
     res.take(10).map(println)
-    * 
-    */
+
     res
   }
 }

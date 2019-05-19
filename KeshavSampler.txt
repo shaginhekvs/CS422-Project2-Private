@@ -1,0 +1,20 @@
+sampler is:  num rowss allowed are:  32743reading now is:  1
+error:  0.00913435553987873
+n:  7634
+done now res is:  0.00913435553987873,3817
+reading now is:  3
+error:  0.0
+n:  1796640
+done now res is:  0.0,898320
+reading now is:  5
+error:  0.0
+n:  1801046
+done now res is:  0.0,900523
+reading now is:  7
+error:  0.009809370088691717
+n:  5052
+done now res is:  0.009809370088691717,2526
+reading now is:  10
+error:  1.8649764718295446E-5
+n:  1455568
+done now res is:  1.8649764718295446E-5,727784
