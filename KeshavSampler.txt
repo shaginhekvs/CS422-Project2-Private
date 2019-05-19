@@ -1,8 +1,0 @@
-sampler is:  num rowss allowed are:  3274reading now is:  1
-error:  0.08834960669360914
-n:  400
-done now res is:  0.08834960669360914,200
-reading now is:  3
-error:  3.747460315141284E-5
-n:  1349642
-done now res is:  3.747460315141284E-5,674821

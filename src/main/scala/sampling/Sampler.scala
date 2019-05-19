@@ -31,6 +31,7 @@ object SubSampler{
     var rdd = df.rdd
     println("Schema is below")
     println(schema)
+    println(groupingAttributes)
     val index = groupingAttributes.map(x => schema.indexOf(x))
     println(index)
     val indexAgg = schema.indexOf(aggAttribute)
@@ -119,8 +120,8 @@ object Sampler {
     oos.writeObject(rdd_row)
     var numRowsAllowed = storageBudgetBytes/stream.size
     pw.write("num rowss allowed are:  "+numRowsAllowed.toString)
-    val listQueriesSamples = List(1,3)//add 3 too later.
-    val groupingAttributesAll = Map(1->List("l_returnflag","l_linestatus"),3->List("l_orderkey"))
+    val listQueriesSamples = List(1,3,5,7,10)//add 3 too later.
+    val groupingAttributesAll = Map(1->List("l_returnflag","l_linestatus","l_shipdate"),3->List("l_orderkey","l_shipdate"),5->List("l_orderkey" , "l_suppkey"),7->List("l_shipdate"),10->List("l_orderkey" , "l_returnflag"),12->List("l_shipmode", "l_commitdate" ,"l_shipdate", "l_receiptdate" , "l_orderkey"),17-> List("l_partkey" , "l_quantity"),18->List("l_orderkey" , "l_quantity"),19->List("l_quantity", "l_shipmode" , "l_shipinstruct"),20->List("l_partkey" ,"l_suppkey" ,"l_shipdate" ))
     val resultAll = collection.mutable.Map[Int,(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double])]()
     val cantstoreAll = collection.mutable.Map[Int,Boolean]()
     val estAttrAll = Map(1->"l_extendedprice",3->"l_extendedprice")
@@ -139,10 +140,11 @@ object Sampler {
       
     pw.write("reading now is:  "+v+"\n") 
     n =  100;
+    
     cant_satisfy_error = false;
     zeroMean = false;
     groupingAttributes = groupingAttributesAll(v)
-    estAttr = estAttrAll(v)
+    estAttr = "l_extendedprice"
 
     var res:(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]) = null;
     
@@ -164,12 +166,15 @@ object Sampler {
     if(!cant_satisfy_error) numRowsAllowed -= res._4; // these many rows are used up
     resultAll += ( v-> res); 
     cantstoreAll += (v->cant_satisfy_error);
+    println(cant_satisfy_error)
     listDF += res._1
     listGrouping += groupingAttributes
     listBooleans += cant_satisfy_error
     listAllCountFracs += res._6 
     }
-
+    for ( i<- 1 to 20)
+      listBooleans += true
+      
     pw.close
     return (listDF.toList,(listQueriesSamples,listGrouping.toList,listBooleans.toList,listAllCountFracs.toList))
   }

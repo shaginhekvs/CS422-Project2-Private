@@ -16,7 +16,7 @@ select
 from
 	lineitem
 where
-	l_shipdate <= date '1998-12-01' - interval ':1' 
+	l_shipdate <= date ':1' 
 group by
 	l_returnflag,
 	l_linestatus
@@ -46,7 +46,7 @@ group by
 	o_shippriority
 order by
 	revenue desc,
-	o_orderdate;
+	o_orderdate  
 LIMIT 10""" 
   var q5 = """
 select
@@ -68,11 +68,11 @@ where
 	and n_regionkey = r_regionkey
 	and r_name = ':1'
 	and o_orderdate >= date ':2'
-	and o_orderdate < date ':2' + interval '1' year
+	and o_orderdate < date ':3'
 group by
 	n_name
 order by
-	revenue desc;
+	revenue desc 
 """ 
   var q6 = """select
 	sum(l_extendedprice * l_discount) as revenue
@@ -80,83 +80,81 @@ from
 	lineitem
 where
 	l_shipdate >= date ':1'
-	and l_shipdate < date ':1' + interval '1' year
+	and l_shipdate < date ':4' 
 	and l_discount between :2 - 0.01 and :2 + 0.01
-	and l_quantity < :3;""" 
+	and l_quantity < :3 """ 
   
   var q7 = """select
-	supp_nation,
-	cust_nation,
-	l_year,
-	sum(volume) as revenue
-from
-	(
-		select
-			n1.n_name as supp_nation,
-			n2.n_name as cust_nation,
-			extract(year from l_shipdate) as l_year,
-			l_extendedprice * (1 - l_discount) as volume
-		from
-			supplier,
-			lineitem,
-			orders,
-			customer,
-			nation n1,
-			nation n2
-		where
-			s_suppkey = l_suppkey
-			and o_orderkey = l_orderkey
-			and c_custkey = o_custkey
-			and s_nationkey = n1.n_nationkey
-			and c_nationkey = n2.n_nationkey
-			and (
-				(n1.n_name = ':1' and n2.n_name = ':2')
-				or (n1.n_name = ':2' and n2.n_name = ':1')
-			)
-			and l_shipdate between date '1995-01-01' and date '1996-12-31'
-	) as shipping
+  supp_nation,
+  cust_nation,
+  l_year,
+  sum(volume) as revenue
+from (
+  select
+    n1.n_name as supp_nation,
+    n2.n_name as cust_nation,
+    year(l_shipdate) as l_year,
+    l_extendedprice * (1 - l_discount) as volume
+  from
+    supplier,
+    lineitem,
+    orders,
+    customer,
+    nation n1,
+    nation n2
+  where
+    s_suppkey = l_suppkey
+    and o_orderkey = l_orderkey
+    and c_custkey = o_custkey
+    and s_nationkey = n1.n_nationkey
+    and c_nationkey = n2.n_nationkey
+    and (
+      (n1.n_name = ':1' and n2.n_name = ':2' )
+      or (n1.n_name = ':2' and n2.n_name = ':1' )
+    )
+    and l_shipdate between '1995-01-01' and '1996-12-31'
+  ) as shipping
 group by
-	supp_nation,
-	cust_nation,
-	l_year
+  supp_nation,
+  cust_nation,
+  l_year
 order by
-	supp_nation,
-	cust_nation,
-	l_year;""" 
+  supp_nation,
+  cust_nation,
+  l_year"""
   
   var q9 = """select
-	nation,
-	o_year,
-	sum(amount) as sum_profit
-from
-	(
-		select
-			n_name as nation,
-			extract(year from o_orderdate) as o_year,
-			l_extendedprice * (1 - l_discount) - ps_supplycost * l_quantity as amount
-		from
-			part,
-			supplier,
-			lineitem,
-			partsupp,
-			orders,
-			nation
-		where
-			s_suppkey = l_suppkey
-			and ps_suppkey = l_suppkey
-			and ps_partkey = l_partkey
-			and p_partkey = l_partkey
-			and o_orderkey = l_orderkey
-			and s_nationkey = n_nationkey
-			and p_name like '%:1%'
-	) as profit
+  nation,
+  o_year,
+  sum(amount) as sum_profit
+from(
+  select
+    n_name as nation,
+    year(o_orderdate) as o_year,
+    l_extendedprice * (1 - l_discount) - ps_supplycost * l_quantity as amount
+  from
+    part,
+    supplier,
+    lineitem,
+    partsupp,
+    orders,
+    nation
+  where
+    s_suppkey = l_suppkey
+    and ps_suppkey = l_suppkey
+    and ps_partkey = l_partkey
+    and p_partkey = l_partkey
+    and o_orderkey = l_orderkey
+    and s_nationkey = n_nationkey
+    and p_name like '%:1%'
+  ) as profit
 group by
-	nation,
-	o_year
+  nation,
+  o_year
 order by
-	nation,
-	o_year desc;
-""" 
+  nation,
+  o_year desc"""
+
   var q10 = """select
 	c_custkey,
 	c_name,
@@ -175,7 +173,7 @@ where
 	c_custkey = o_custkey
 	and l_orderkey = o_orderkey
 	and o_orderdate >= date ':1'
-	and o_orderdate < date ':1' + interval '3' month
+	and o_orderdate < date ':2' 
 	and l_returnflag = 'R'
 	and c_nationkey = n_nationkey
 group by
@@ -187,7 +185,7 @@ group by
 	c_address,
 	c_comment
 order by
-	revenue desc;
+	revenue desc 
 LIMIT 20""" 
   var q11 = """select
 	ps_partkey,
@@ -239,11 +237,11 @@ where
 	and l_commitdate < l_receiptdate
 	and l_shipdate < l_commitdate
 	and l_receiptdate >= date ':3'
-	and l_receiptdate < date ':3' + interval '1' year
+	and l_receiptdate < date ':4' 
 group by
 	l_shipmode
 order by
-	l_shipmode;""" 
+	l_shipmode """ 
   var q17 = """select
 	sum(l_extendedprice) / 7.0 as avg_yearly
 from
@@ -260,7 +258,7 @@ where
 			lineitem
 		where
 			l_partkey = p_partkey
-	);""" 
+	) """ 
   var q18 = """select
 	c_name,
 	c_custkey,
@@ -292,7 +290,7 @@ group by
 	o_totalprice
 order by
 	o_totalprice desc,
-	o_orderdate;
+	o_orderdate 
 LIMIT 100""" 
   var q19 = """select
 	sum(l_extendedprice* (1 - l_discount)) as revenue
@@ -359,13 +357,13 @@ where
 					l_partkey = ps_partkey
 					and l_suppkey = ps_suppkey
 					and l_shipdate >= date ':2'
-					and l_shipdate < date ':2' + interval '1' year
+					and l_shipdate < date ':4' 
 			)
 	)
 	and s_nationkey = n_nationkey
 	and n_name = ':3'
 order by
-	s_name;""" 
+	s_name """ 
   
   
 }
