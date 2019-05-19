@@ -15,7 +15,8 @@ object Main {
     // test reducers numbers 6 10 16 21 25 30
     val reducers = 16
 
-    //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
+    val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
+    /*
     val inputFile0= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_small_half.tbl"
     val inputFile1= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_small.tbl"
     
@@ -26,7 +27,7 @@ object Main {
     
     val inputFile5= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_big_half.tbl"
     val inputFile6= "/Users/joseph/Desktop/CS422-Project2-Private/src/main/resources/lineorder_big.tbl"
-    
+    */
     
     // option 1 
     //val inputFile = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
@@ -45,7 +46,7 @@ object Main {
     .option("header", "true")
     .option("inferSchema", "true")
     .option("delimiter", "|")
-    .load(inputFile3)
+    .load(inputFile)
       
     val rdd = df.rdd
     val rdd_row = rdd.take(1) 
@@ -96,9 +97,9 @@ object Main {
     // Cluster test
     //var groupingList = List("l_suppkey","l_shipmode","l_shipdate")
     println("fast")
-    val res = cb.cube(dataset, groupingList, "lo_quantity", "AVG")
+    val res = cb.cube(dataset, groupingList, "lo_quantity", "MIN")
     println("naive")
-    val res2 = cb.cube_naive(dataset, groupingList, "lo_quantity", "AVG")
+    val res2 = cb.cube_naive(dataset, groupingList, "lo_quantity", "MIN")
 
     /*
        The above call corresponds to the query:
@@ -114,7 +115,7 @@ object Main {
           .agg(sum("lo_quantity") as "avg quantity");
           //.agg(sum("lo_supplycost") as "avg supplycost");
 
-        q1.show
+        println(q1.count)
         val duration = (System.currentTimeMillis() - tsql) / 1000.0
         print("duration of SparkSQL cube is: ")
         println(duration)

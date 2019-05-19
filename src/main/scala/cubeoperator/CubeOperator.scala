@@ -183,10 +183,10 @@ class CubeOperator(reducers: Int) {
   //stringKey.take(10).map(println); 
   val sorted = stringKey.sortByKey();
   //sorted.take(10).map(println);
-
+  println("count of dataset is "+sorted.count().toString)
   val duration = (System.currentTimeMillis() - t1) / 1000.0
   print("duration of cube is")
-  val pw = new PrintWriter(new File("/tmp/KeshavCube.txt" ))
+  val pw = new PrintWriter(new File("./KeshavCube.txt" ))
   pw.write("duration of cube is:  ")
   pw.write(duration.toString)
   pw.close

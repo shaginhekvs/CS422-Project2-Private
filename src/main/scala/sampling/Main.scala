@@ -14,18 +14,21 @@ object Main {
     //val sc = SparkContext.getOrCreate()
     // PrintWriter
     
-    //val qs = new GQueries 
-    //val s = qs.q1
-    //var params = List("3 months")
-    //var query = ExecutorHelpers.multipleReplace(s, params)
 
-    val sparkConf = new SparkConf().setAppName("CS422-Project2")//.setMaster("local[*]")
+
+
+    val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[*]")
     //sparkConf.set("spark.network.timeout", "3600s")
     val ctx = new SparkContext(sparkConf)
     val sqlContext = new org.apache.spark.sql.SQLContext(ctx)  
     val session = SparkSession.builder().getOrCreate();
     //val rdd = RandomRDDs.uniformRDD(sc, 100000)
 
+    val inputFileLineItem = "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\big\\tpch_parquet_sf1\\lineitem.parquet"
+    val inputFileCustomer = "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\big\\tpch_parquet_sf1\\customer.parquet"
+    val inputFileOrders = "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\big\\tpch_parquet_sf1\\order.parquet"
+    
+    /*
     val inputFileLineItem = "/cs422-data/tpch/sf100/parquet/lineitem.parquet"
 
     val inputFileNation = "/cs422-data/tpch/sf100/parquet/nation.parquet"
@@ -33,29 +36,34 @@ object Main {
     val inputFileCustomer = "/cs422-data/tpch/sf100/parquet/customer.parquet"
     val inputFileOrders = "/cs422-data/tpch/sf100/parquet/order.parquet"
     val inputFilepartsupp = "/cs422-data/tpch/sf100/parquet/partsupp.parquet"
+    val inputFileRegion = "/cs422-data/tpch/sf100/parquet/region.parquet"
     val inputFileParts = "/cs422-data/tpch/sf100/parquet/parts.parquet"
-    
+    */
     val dfLineItem = sqlContext.read.option("delimiter", "|").parquet(inputFileLineItem);    
+    /*
     val dfSupplier = sqlContext.read.option("delimiter", "|").parquet(inputFileSupplier);
     val dfNation = sqlContext.read.option("delimiter", "|").parquet(inputFileNation);
     val dfPartsupp = sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
     val dfOrders = sqlContext.read.option("delimiter", "|").parquet(inputFileOrders);
     val dfCustomer = sqlContext.read.option("delimiter", "|").parquet(inputFileCustomer);
 
-    
+    */
 
     var desc = new Description
     desc.lineitem = dfLineItem
+    
     desc.customer = sqlContext.read.option("delimiter", "|").parquet(inputFileCustomer);
     desc.orders  = sqlContext.read.option("delimiter", "|").parquet(inputFileOrders);
+    /*
     desc.supplier = sqlContext.read.option("delimiter", "|").parquet(inputFileSupplier);
     desc.nation = sqlContext.read.option("delimiter", "|").parquet(inputFileNation);
-    desc.region = sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
-    
+    desc.partsupp = sqlContext.read.option("delimiter", "|").parquet(inputFilepartsupp);
+    desc.region = sqlContext.read.option("delimiter", "|").parquet(inputFileRegion);
+    */
     desc.e = 0.1
     desc.ci = 0.95
 
-    val tmp = Sampler.sample(desc.lineitem, 1000000, desc.e, desc.ci)
+    val tmp = Sampler.sample(desc.lineitem, 10000000, desc.e, desc.ci)
     desc.samples = tmp._1
     desc.sampleDescription = tmp._2
 
@@ -63,6 +71,7 @@ object Main {
 
 
     Executor.execute_Q1(desc, sqlContext,session, List("3 months"))
+    Executor.execute_Q3(desc, sqlContext,session, List("3 months",2))
 
      //val inputFile= "C:\\Users\\Dell\\Documents\\courses\\2019\\semA\\DB\\CS422-Project2-Private\\src\\main\\resources\\lineorder_small.tbl"
      //val sparkConf = new SparkConf().setAppName("CS422-Project2").setMaster("local[16]")

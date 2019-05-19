@@ -109,7 +109,7 @@ object SubSampler{
 object Sampler {
   def sample(lineitem: DataFrame, storageBudgetBytes: Long ,e:Double,ci: Double): (List[DataFrame], (List[Int],List[List[String]],List[Boolean],List[scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double]])) = {
     // TODO: implement
-    val pw = new PrintWriter(new File("/tmp/KeshavSampler.txt" ))
+    val pw = new PrintWriter(new File("./KeshavSampler.txt" ))
     pw.write("sampler is:  ")
    
     val rdd = lineitem.rdd
@@ -119,7 +119,7 @@ object Sampler {
     oos.writeObject(rdd_row)
     var numRowsAllowed = storageBudgetBytes/stream.size
     pw.write("num rowss allowed are:  "+numRowsAllowed.toString)
-    val listQueriesSamples = List(1)//add 3 too later.
+    val listQueriesSamples = List(1,3)//add 3 too later.
     val groupingAttributesAll = Map(1->List("l_returnflag","l_linestatus"),3->List("l_orderkey"))
     val resultAll = collection.mutable.Map[Int,(DataFrame,Double,Double,Int,Int,scala.collection.Map[scala.collection.mutable.Map[Int,Any],Double])]()
     val cantstoreAll = collection.mutable.Map[Int,Boolean]()

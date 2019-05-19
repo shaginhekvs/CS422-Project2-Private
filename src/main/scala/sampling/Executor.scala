@@ -15,9 +15,12 @@ object ExecutorHelpers {
   
   def multipleReplace(text: String, params: List[Any]): String ={
     var modtext: String = text 
-    for (i<- 0 to params.size + 1 ){
-      var ch: String = ":" + (i+1).toString();
-      modtext = modtext.replaceAll(ch, params(i).toString())
+
+    println(params.size)
+    for (i<- 1 to params.size){
+      var ch: String = ":" + (i).toString();
+      modtext = modtext.replaceAll(ch, params(i-1).toString())
+
     }
     return modtext
   }
@@ -34,13 +37,13 @@ object ExecutorHelpers {
     listVals += MyFunctions.parseDouble(thisRow._2.get(x)).getOrElse(0.0)/scale_const;
    }
    else{
-     listVals += thisRow._2.get(x);
+     listVals += thisRow._2.getAs(x);
    }
    });
-   (thisRow._1,Row(listVals.toSeq))
+   (thisRow._1,Row.fromSeq(listVals.toSeq))
   }
   
-  def processOutput(sqlDF : DataFrame,desc:Description,session:SparkSession,dataIndex :Int): DataFrame={
+  def processOutput(sqlDF : DataFrame,desc:Description,session:SparkSession,dataIndex :Int): RDD[Row]={
     val schema = sqlDF.schema.toList.map(x => x.name)
     var colToIndex =collection.mutable.Map [String,Int]();
     schema.foreach(x=> {colToIndex += (x-> schema.indexOf(x))})
@@ -49,11 +52,19 @@ object ExecutorHelpers {
     val index_vals = cols_but_qcs.map(x => schema.indexOf(x))
     val index_keys = cols_but_qcs.map(x => schema.indexOf(x))
     val sqlrdd = sqlDF.rdd
+    //println("old")
+    //sqlrdd.take(10).map(println)
     val keyedRow = sqlrdd.map(x=>(MyFunctions.genMap(index_keys,x),x));
     //  scale the values now ,
-    val scaled = keyedRow.map(x=> ExecutorHelpers.scaleOutput(x,all_index,index_vals,desc.sampleDescription._4(dataIndex)))
-    val df_sub = session.createDataFrame(scaled.map(_._2), desc.lineitem.schema)
-    df_sub
+    val NHMap = desc.sampleDescription._4(dataIndex)
+    val newMap = collection.mutable.Map[scala.collection.mutable.Map[Int,Any],Double] ();
+    NHMap.keySet.foreach(x=>{newMap += (x-> NHMap(x))});
+    val scaled = keyedRow.map(x=> ExecutorHelpers.scaleOutput(x,all_index,index_vals,newMap))
+
+    //println("new")
+    //scaled.map(_._2).take(10).map(println)
+    //val df_sub = session.createDataFrame(scaled.map(_._2), sqlDF.schema)
+    scaled.map(_._2)
   }
 }
 
@@ -75,24 +86,32 @@ object Executor {
       }
     bufferedSource.close
     */
-    val qs = new Queries
-    //val qs = new GQueries 
+    //val qs = new Queries
+    val qs = new GQueries 
     val s = qs.q1
     if(!desc.sampleDescription._3(0)){
+      print("using samples")
       desc.samples(0).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
-    //var query = ExecutorHelpers.multipleReplace(s, params)
+    var query = ExecutorHelpers.multipleReplace(s, params)
     
-    var sqlDF = sqlContext.sql(s);
+    //var sqlDF = sqlContext.sql(s);
+    var sqlDF = sqlContext.sql(query);
+    sqlDF.show()
+    var res = sqlDF.rdd
     //var sqlDF = sqlContext.sql(query);
     if(!desc.sampleDescription._3(0)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,0)
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,0)
+      print("done processing output")
     }
-    println("result of query")
-    sqlDF.show()
+    println("result of query is below ")
+    
+    res.take(10).map(println)
+    res
     
     //sqlDF.write.csv("/home/ksingh/1_result.csv")
   }
@@ -105,25 +124,30 @@ object Executor {
     // params(0) as :1
     // params(1) as :2
     
-    ////val qs = new Queries
-    val qs = new GQueries 
+    val qs = new Queries
+    //val qs = new GQueries 
     desc.customer.createOrReplaceTempView("customer");
     desc.orders.createOrReplaceTempView("orders");
     val s: String = qs.q3
     var query = ExecutorHelpers.multipleReplace(s, params)
     if(!desc.sampleDescription._3(1)){
-      desc.samples(0).createOrReplaceTempView("lineitem");
+      desc.samples(1).createOrReplaceTempView("lineitem");
     }
     else{
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
-    }
-    println("result of query 3")
+    var sqlDF = sqlContext.sql(s);
     sqlDF.show()
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(0)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,0)
+      print("done processing output")
+    }
+    println("result of query is below ")
+    res.take(10).map(println)
+    res
     
     
   }
@@ -145,13 +169,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 5")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q6(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -170,13 +198,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 6")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
     def execute_Q7(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -195,13 +227,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 7")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q9(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -220,13 +256,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 9")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q10(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -245,13 +285,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 10")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_11(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -270,13 +314,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 11")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q12(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -295,13 +343,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 12")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q17(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -320,13 +372,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 17")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q18(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -345,13 +401,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 18")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q19(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -370,13 +430,17 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 19")
-    sqlDF.show()
+    println("result of query")
+    res.take(10).map(println)
+    res
   }
 
   def execute_Q20(desc: Description,  sqlContext : org.apache.spark.sql.SQLContext,session: SparkSession, params: List[Any]) = {
@@ -395,12 +459,16 @@ object Executor {
       desc.lineitem.createOrReplaceTempView("lineitem");
     }
     
-    //var sqlDF = sqlContext.sql(s);
-    var sqlDF = sqlContext.sql(query);
-    if(!desc.sampleDescription._3(1)){
-      sqlDF = ExecutorHelpers.processOutput(sqlDF,desc,session,1)
+    var sqlDF = sqlContext.sql(s);
+    var res = sqlDF.rdd
+    //var sqlDF = sqlContext.sql(query);
+    if(!desc.sampleDescription._3(2)){
+      print("processing output")
+      res = ExecutorHelpers.processOutput(sqlDF,desc,session,2)
+      print("done processing output")
     }
-    println("result of query 20")
-    sqlDF.show()
+    println("result of query is below ")
+    res.take(10).map(println)
+    res
   }
 }
