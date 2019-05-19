@@ -99,16 +99,14 @@ class SimilarityJoin(numAnchors: Int, distThreshold:Int) extends java.io.Seriali
     val rdd_anchors_array = rdd_anchors.collect();
     // step 2 : filtering
     val rdd_filtered = rdd.flatMap(x=>MyFunctions.filterVals(rdd_anchors_array,x,attrIndex,distThreshold));
-    //val x = rdd_filtered.take(10).map(println )
      //step 3 : verification
     val rdd_reduced = rdd_filtered.groupByKey();
     val rdd_verified = rdd_reduced.flatMap(x=>MyFunctions.verify(x._1,x._2,attrIndex,distThreshold))
     
-    //rdd_verified.take(10).map(println );
-    //println(overallRowSize)
-    
     val final_rdd = rdd_verified.map(x=>(x._1.getString(attrIndex),x._2.getString(attrIndex)))
     val final_rdd_filtered = final_rdd.filter(x=>(x._1 != x._2)).distinct()
+
+    val duration = (System.currentTimeMillis() - t1) / 1000.0
 
     final_rdd
   }

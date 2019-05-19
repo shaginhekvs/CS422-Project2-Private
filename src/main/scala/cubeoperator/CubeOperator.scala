@@ -122,76 +122,28 @@ object MyFunctionsNaive {
 
 
 class CubeOperator(reducers: Int) {
-
-  /*
- * This method gets as input one dataset, the grouping attributes of the cube (CUBE BY clause)
- * the attribute on which the aggregation is performed
- * and the aggregate function (it has to be one of "COUNT", "SUM", "MIN", "MAX", "AVG")
- * and returns an RDD with the result in the form of <key = string, value = double> pairs.
- * The key is used to uniquely identify a group that corresponds to a certain combination of attribute values.
- * You are free to do that following your own naming convention.
- * The value is the aggregation result.
- * You are not allowed to change the definition of this function or the names of the aggregate functions.
- * */
-  
- 
+   
   def cube(dataset: Dataset, groupingAttributes: List[String], aggAttribute: String, agg: String): RDD[(String, Double)] = {
     val t1 = System.currentTimeMillis()
 
     val rdd = dataset.getRDD()
     val schema = dataset.getSchema()
-    //println("Schema is below")
-    //println(schema)
     val index = groupingAttributes.map(x => schema.indexOf(x))
-    //println(index)
     val indexAgg = schema.indexOf(aggAttribute)
     val mrspreadMap = rdd.map(x=>(MyFunctions.genMap(index,x),(MyFunctions.genValue(indexAgg,x,agg),1.0)));
-    //mrspreadMap.take(10).map(println );
-    /*
-    val mrspreadCombine =  mrspreadMap.mapPartitions(it =>
-    it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
-      (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
-    ).toIterator
-  )
-  * 
-  */
-  //println("mrspread combine below")
-  //mrspreadCombine.take(10).map(println );
-  
-  //val mrspreadReduce = mrspreadCombine.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
+
   val mrspreadReduce = mrspreadMap.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers).persist()
-  //println("mrspread reduce below")
-  //mrspreadReduce.take(10).map(println );  
+  
   val mrspreadPartialCells = mrspreadReduce.flatMap((x)=>MyFunctions.genPartialCells(x._1,x._2._1,x._2._2));
-  //println("mrspread partial cells below")
-  //mrspreadPartialCells.take(10).map(println); 
-  //println("mrassemble combine");
- /*
-  val mrAssembleCombine = mrspreadPartialCells.mapPartitions(it =>
-    it.foldLeft(new collection.mutable.HashMap[collection.mutable.Map[Int,Any], (Double,Double)])(
-      (count, row) => count += (row._1 -> (MyFunctions.accumulateFunc(MyFunctions.getHashMapValue(row._1,count ,agg ),row._2,agg)))
-    ).toIterator
-  )
-  * *
-  */
   
   val mrAssembleReduce = mrspreadPartialCells.reduceByKey((x,y)=>MyFunctions.accumulateFunc(x,y,agg),reducers)
   
   val stringKey = mrAssembleReduce.map((x)=>MyFunctions.makeStringKey(x,index,agg))
   
-  //mrAssembleReduce.take(10).map(println); 
-  //stringKey.take(10).map(println); 
   val sorted = stringKey.sortByKey();
-  //sorted.take(10).map(println);
-  println("count of dataset is "+sorted.count().toString)
+
   val duration = (System.currentTimeMillis() - t1) / 1000.0
-  print("duration of cube is")
-  val pw = new PrintWriter(new File("./KeshavCube.txt" ))
-  pw.write("duration of cube is:  ")
-  pw.write(duration.toString)
-  pw.close
-  println(duration)
-  
+
   sorted
   
   }
@@ -210,24 +162,18 @@ class CubeOperator(reducers: Int) {
     for(x<- Range(0,index.size+1)){
       for (l <- index.combinations(x).toList)
           allPartitions += l
-      //allPartitions
     }
     
     val afterMap = rdd.flatMap(x=> (MyFunctionsNaive.genRegionTupes(allPartitions,x,indexAgg, agg)));
+    
     val reduceRegions = afterMap.reduceByKey((x,y)=> {MyFunctionsNaive.accumulateFunc(x,y,agg)},reducers);
+    
     val stringKey = reduceRegions.map((x)=>MyFunctions.makeStringKey(x,index,agg))
+    
     val sorted = stringKey.sortByKey();
-    //sorted.take(10).map(println);
-    //println(allPartitions)
-    //afterMap.take(10).map(println);
-    println("count of dataset is "+sorted.count().toString)
+
     val duration = (System.currentTimeMillis() - t1) / 1000.0
-    print("duration of cube naive is")
-    val pw = new PrintWriter(new File("CubeNaive.txt" ))
-    pw.write("duration of cube is:  ")
-    pw.write(duration.toString)
-    pw.close
-    println(duration)
+
     sorted
   }
 
